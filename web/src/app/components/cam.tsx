@@ -38,7 +38,6 @@ export default function Camera() {
             setError(`getUserMedia error: ${String(error)}`);
         }
     };
-    //test
     const init = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia(constraints);

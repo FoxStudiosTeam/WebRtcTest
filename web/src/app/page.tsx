@@ -1,11 +1,11 @@
 "use client"
 
-import Camera from "@/app/components/cam";
+import SocketCamera from "@/app/components/socket_cam";
 
 export default function Home() {
   return (
       <div>
-          <Camera/>
+          <SocketCamera/>
       </div>
   );
 }

@@ -1,8 +1,8 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
 
 const constraints = {
-    audio: false,
+    audio: true, // Включено аудио
     video: true,
 };
 
@@ -13,19 +13,29 @@ export default function Camera() {
     const handleSuccess = (stream: MediaStream) => {
         const video = document.querySelector("video") as HTMLVideoElement;
         const videoTracks = stream.getVideoTracks();
+        const audioTracks = stream.getAudioTracks();
+
         console.log("Got stream with constraints:", constraints);
-        console.log(`Using video device: ${videoTracks[0].label}`);
+        if (videoTracks.length > 0) {
+            console.log(`Using video device: ${videoTracks[0].label}`);
+        }
+        if (audioTracks.length > 0) {
+            console.log(`Using audio device: ${audioTracks[0].label}`);
+        }
+
         setStream(stream);
         video.srcObject = stream;
     };
 
     const handleError = (error: unknown) => {
         if (error instanceof OverconstrainedError) {
-            setError(`OverconstrainedError: The constraints could not be satisfied by the available devices. Constraints: ${JSON.stringify(constraints)}`);
-        } else if (error instanceof DOMException) { //fix
+            setError(
+                `OverconstrainedError: The constraints could not be satisfied by the available devices. Constraints: ${JSON.stringify(constraints)}`
+            );
+        } else if (error instanceof DOMException) {
             setError("NotAllowedError: Permissions have not been granted to use your camera and microphone.");
         } else {
-            setError(`getUserMedia error: ${error}`);
+            setError(`getUserMedia error: ${String(error)}`);
         }
     };
 
@@ -33,7 +43,7 @@ export default function Camera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
             handleSuccess(stream);
-        } catch (e : unknown) {
+        } catch (e) {
             handleError(e);
         }
     };
@@ -53,7 +63,11 @@ export default function Camera() {
             <button id="showVideo" onClick={init}>
                 Open camera
             </button>
-            {error && <div id="errorMsg"><p>{error}</p></div>}
+            {error && (
+                <div id="errorMsg">
+                    <p>{error}</p>
+                </div>
+            )}
         </div>
     );
 }

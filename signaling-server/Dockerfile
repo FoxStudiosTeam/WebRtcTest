@@ -2,6 +2,8 @@ FROM gradle:8-jdk17-alpine AS builder
 LABEL authors="Senko-san"
 LABEL authors="AgniaEndie"
 
+EXPOSE 8080
+
 WORKDIR /tmp
 COPY . /tmp
 

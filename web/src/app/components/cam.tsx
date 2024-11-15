@@ -19,10 +19,10 @@ export default function Camera() {
         video.srcObject = stream;
     };
 
-    const handleError = (error: never) => {
-        if (error === "OverconstrainedError") {
+    const handleError = (error: unknown) => {
+        if (error instanceof OverconstrainedError) {
             setError(`OverconstrainedError: The constraints could not be satisfied by the available devices. Constraints: ${JSON.stringify(constraints)}`);
-        } else if (error=== "NotAllowedError") {
+        } else if (error instanceof DOMException) { //fix
             setError("NotAllowedError: Permissions have not been granted to use your camera and microphone.");
         } else {
             setError(`getUserMedia error: ${error}`);
@@ -33,7 +33,7 @@ export default function Camera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
             handleSuccess(stream);
-        } catch (e) {
+        } catch (e : unknown) {
             handleError(e);
         }
     };

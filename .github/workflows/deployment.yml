@@ -59,5 +59,31 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+  web:
+    name: Push WebRTC-web to Docker Hub
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    working-directory: ./web
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
 
+      - name: Install Dependencies
+        uses: actions/checkout@v4
+        run: npm install
 
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: endienasg/webrtc-web
+
+      - name: Build and push Docker image of WebRTC-web
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

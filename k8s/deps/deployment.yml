@@ -76,7 +76,7 @@ spec:
                   key: pg-password
                   name: postgres-secret
 ---
-#Service (Networking) of Signaling server (RFC-8835) TODO: replace it with normal in-cluster solution)
+#Service (Networking) of Room server (TODO: replace it with normal in-cluster solution)
 apiVersion: v1
 kind: Service
 metadata:

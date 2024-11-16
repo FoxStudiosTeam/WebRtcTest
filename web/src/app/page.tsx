@@ -1,12 +1,11 @@
 "use client"
 
-
-import {FTerminal} from "@/app/pages/terminal/page";
+import FSupport from "@/app/pages/support/page";
 
 export default function Home() {
   return (
       <div>
-          <FTerminal/>
+          <FSupport/>
       </div>
   );
 }

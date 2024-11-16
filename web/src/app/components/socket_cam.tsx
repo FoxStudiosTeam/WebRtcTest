@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-
+import Image from 'next/image'
+import chatPic from '@/assets/chat.svg'
+import phonePic from '@/assets/Phone.svg'
+import micOff from '@/assets/Mic-off.svg'
+import micOn from '@/assets/Mic-on.svg'
+import { MicOff } from './micOff';
+import { MicOn } from './micOn';
+import { Reset } from './reset';
 interface WebRTCMessage {
     type: 'join' | 'offer' | 'answer' | 'ice-candidate' | 'user_joined';
     data?: RTCSessionDescriptionInit | RTCIceCandidateInit;
@@ -8,9 +15,9 @@ interface WebRTCMessage {
 
 const configuration: RTCConfiguration = {
     iceServers: [
-        //{ urls: 'stun:kaiv.space:8100' }
+        { urls: 'stun:kaiv.space:3478' },
         //{ urls: 'stun:stun.l.google.com:19302' },
-       // { urls: 'stun:stun1.l.google.com:19302' }
+        //{ urls: 'stun:stun1.l.google.com:19302' }
     ]
 };
 
@@ -19,6 +26,9 @@ export default function WebRTCChat() {
     const [roomId, setRoomId] = useState('test-room');
     const [isAudioMuted, setIsAudioMuted] = useState(false);
     const [isVideoMuted, setIsVideoMuted] = useState(false);
+    const [volume, setVolume] = useState(1);
+    const audioContextRef = useRef<AudioContext | null>(null);
+    const gainNodeRef = useRef<GainNode | null>(null);
     
     const localVideoRef = useRef<HTMLVideoElement>(null);
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -33,6 +43,10 @@ export default function WebRTCChat() {
             wsRef.current.send(JSON.stringify(message));
         }
     };
+    
+    useEffect(() => {
+        handleStartCamera();
+    }, []);
 
     const createPeerConnection = () => {
         if (peerConnectionRef.current) {
@@ -53,6 +67,16 @@ export default function WebRTCChat() {
         peerConnection.ontrack = event => {
             console.log("Received remote track", event);
             if (remoteVideoRef.current && remoteVideoRef.current.srcObject !== event.streams[0]) {
+                if (event.track.kind === 'audio') {
+                    // Create audio context and gain node for volume control
+                    audioContextRef.current = new AudioContext();
+                    const source = audioContextRef.current.createMediaStreamSource(event.streams[0]);
+                    gainNodeRef.current = audioContextRef.current.createGain();
+                    gainNodeRef.current.gain.value = volume;
+                    
+                    source.connect(gainNodeRef.current);
+                    gainNodeRef.current.connect(audioContextRef.current.destination);
+                }
                 remoteVideoRef.current.srcObject = event.streams[0];
             }
         };
@@ -106,7 +130,6 @@ export default function WebRTCChat() {
         wsRef.current.onmessage = async (event) => {
             const message: WebRTCMessage = JSON.parse(event.data);
             console.log('Received message:', message);
-            
             try {
                 switch (message.type) {
                     case 'user_joined':
@@ -120,7 +143,6 @@ export default function WebRTCChat() {
                             room: roomId
                         });
                         break;
-                        
                     case 'offer':
                         console.log("Received offer, creating answer");
                         const pc2 = createPeerConnection();
@@ -133,7 +155,6 @@ export default function WebRTCChat() {
                             room: roomId
                         });
                         break;
-                        
                     case 'answer':
                         console.log("Received answer");
                         if (peerConnectionRef.current) {
@@ -142,7 +163,6 @@ export default function WebRTCChat() {
                             );
                         }
                         break;
-                        
                     case 'ice-candidate':
                         console.log("Received ICE candidate");
                         if (peerConnectionRef.current) {
@@ -172,19 +192,26 @@ export default function WebRTCChat() {
 
     const handleToggleAudio = () => {
         if (localStreamRef.current) {
-            setIsAudioMuted(!isAudioMuted);
             localStreamRef.current.getAudioTracks().forEach(track => {
-                track.enabled = !isAudioMuted;
+                track.enabled = isAudioMuted;
             });
+            setIsAudioMuted(!isAudioMuted);
         }
     };
 
     const handleToggleVideo = () => {
         if (localStreamRef.current) {
-            setIsVideoMuted(!isVideoMuted);
             localStreamRef.current.getVideoTracks().forEach(track => {
-                track.enabled = !isVideoMuted;
+                track.enabled = isVideoMuted;
             });
+            setIsVideoMuted(!isVideoMuted);
+        }
+    };
+
+    const handleVolumeChange = (newVolume: number) => {
+        setVolume(newVolume);
+        if (gainNodeRef.current) {
+            gainNodeRef.current.gain.value = newVolume;
         }
     };
 
@@ -195,66 +222,95 @@ export default function WebRTCChat() {
             wsRef.current?.close();
         };
     }, []);
-
-    return (
-        <div>
-            <div className="video-container">
-                <video
+    /*
+    <video className='object-cover bg-blue-500'
                     ref={localVideoRef}
                     autoPlay
                     playsInline
                     muted
-                />
-                <video
+                />*/
+    return (
+        <div className='absolute bg-green-500 w-full h-full'>
+            
+            <div className="w-full bg-white absolute h-full">
+                <video className='w-full h-full object-contain'
                     ref={remoteVideoRef}
                     autoPlay
                     playsInline
                 />
             </div>
-            <div className="controls">
+            <div className="w-[200px] bg-white h-[200px] absolute top-[30px] left-[30px]">
+                <video className='w-full h-full object-contain'
+                    ref={localVideoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                />
+            </div>
+            <div className="video-container container relative flex">
+                <div className='w-[100%] h-[100%] bg-red-500'></div>
+                <video className='hidden'
+                    ref={remoteVideoRef}
+                    autoPlay
+                    playsInline
+                />
+            </div>
+
+            <button
+                    className='bg-[#DC362E] w-[100px] h-[100px] rounded-[10px] text-2xl shadow-xl font-bold flex 
+                    justify-center items-center gap-2 absolute top-[10px] right-[10px]'
+                    disabled={!localStreamRef.current}
+                >
+                    ГРОМЧЕ
+            </button>
+            <button
+                    className='bg-[#DC362E] w-[100px] h-[100px] rounded-[10px] text-2xl shadow-xl font-bold flex 
+                    justify-center items-center gap-2 absolute top-[10px] right-[120px]'
+                    disabled={!localStreamRef.current}
+                >
+                    ТИШЕ
+            </button>
+
+            <div className="controls flex justify-center gap-10 bottom-[24px] w-full absolute z-10">
                 <input
+                    className='absolute left-0 bg-green-500 text-red-500 text-center rounded'
                     value={roomId}
                     onChange={(e) => setRoomId(e.target.value)}
                     placeholder="Enter room ID"
                 />
                 <button
+                    className='absolute left-0 top-[-2rem] bg-green-500 text-red-500 text-center rounded'
                     onClick={handleJoinRoom}
                     disabled={isJoinButtonDisabled}
                 >Join Room
                 </button>
                 <button
+                    className='absolute left-0 top-[-4rem] bg-green-500 text-red-500 text-center rounded'
                 onClick={handleStartCamera}>Start Camera
                 </button>
                 <button
-                    onClick={handleToggleAudio}
-                    disabled={!localStreamRef.current}
-                >
-                    {isAudioMuted ? 'Mute Mic' : 'Unmute Mic'}
-                </button>
-                <button
+                    className='bg-[#DC362E] w-[372px] h-[77px] rounded-[10px] text-2xl shadow-xl font-bold flex justify-center items-center gap-2'
                     onClick={handleToggleVideo}
                     disabled={!localStreamRef.current}
                 >
-                    {isVideoMuted ? 'Disable Video' : 'Enable Video'}
+                    {isVideoMuted ? 'Вас не видно' : 'Вас видно'}
                 </button>
+                {isAudioMuted ? <MicOff onclick={handleToggleAudio}/> : <MicOn onclick={handleToggleAudio}/>}
+                <Reset/>
+                <input
+                    type="range"
+                    min="0"
+                    max="2"
+                    step="0.01"
+                    value={volume}
+                    onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+                    className="
+                    w-[200px] rotate-[-90deg] absolute right-[-80px] bottom-[190px]
+                    h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700
+                    scale-[2] 
+                    "
+                />
             </div>
-            <style jsx>{`
-                .video-container {
-                    display: flex;
-                    gap: 20px;
-                    margin: 20px;
-                }
-                video {
-                    width: 400px;
-                    background: #2f2f2f;
-                }
-                .controls {
-                    margin: 20px;
-                    display: flex;
-                    gap: 10px;
-                    align-items: center;
-                }
-            `}</style>
         </div>
     );
 }

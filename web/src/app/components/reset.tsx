@@ -7,9 +7,9 @@ export function Reset(){
     return(
       <div>
           <div className="w-[100%] flex justify-center">
-              <button className=" bg-[#DC362E] w-[372px] h-[77px] rounded-[10px] flex justify-center items-center space-x-[10%]">
+              <button className=" bg-[#DC362E] active:bg-[#B82D26] w-[372px] h-[77px] rounded-[10px] gap-0 flex justify-center items-center space-x-[5%]">
                   <p className="text-white text-2xl">ЗАВЕРШИТЬ</p>
-                  <Image src={phone} height={35} width={35} alt={"phone"}/>
+                  <Image src={phone} height={40} width={40} alt={"phone"}/>
               </button>
           </div>
       </div>

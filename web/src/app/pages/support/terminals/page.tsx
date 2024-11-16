@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { Header } from "@/app/components/header";
 import Image from "next/image";
 import stat from "@/assets/stat.svg";
@@ -21,10 +21,10 @@ export default function Terminals() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        axios.get("http://localhost:8080/api/v1/rooms/all").then((response) => {
+        axios.get("http://localhost:8080/api/v1/rooms/all").then((response: { data: SetStateAction<Room[]>; }) => {
                 setRooms(response.data);
                 setLoading(false);
-            }).catch((error) => {
+            }).catch((error: any) => {
                 console.error("Error fetching rooms:", error);
                 setError("Не удалось загрузить данные.");
                 setLoading(false);

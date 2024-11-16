@@ -23,6 +23,12 @@ repositories {
     mavenCentral()
 }
 
+tasks.withType<Jar>{
+    manifest{
+        attributes["Main-Class"] = "foxstudios.ru.ApplicationKt"
+    }
+}
+
 dependencies {
     implementation("io.ktor:ktor-server-default-headers-jvm")
     implementation("io.ktor:ktor-server-cors-jvm")

@@ -69,10 +69,6 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-      - name: Install Dependencies
-        uses: actions/checkout@v4
-        run: npm install
-
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7

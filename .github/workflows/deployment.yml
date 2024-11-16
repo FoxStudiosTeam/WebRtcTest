@@ -19,6 +19,8 @@ jobs:
   signaling_server_build_and_push:
     name: Push Signaling Server to Docker Hub
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4

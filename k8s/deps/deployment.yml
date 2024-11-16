@@ -55,7 +55,7 @@ spec:
     spec:
       containers:
         - name: signaling-server-pod
-          image: endienasg/web-rtc-room-service:pr-7
+          image: endienasg/web-rtc-room-service:master
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -80,7 +80,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: signaling-server-service
+  name: room-service-service
   labels:
     env: prod
     owner: endienasg

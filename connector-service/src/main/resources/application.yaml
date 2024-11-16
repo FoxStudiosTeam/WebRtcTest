@@ -1,0 +1,6 @@
+ktor:
+  application:
+    modules:
+      - ru.foxstudios.ApplicationKt.module
+  deployment:
+    port: 8080

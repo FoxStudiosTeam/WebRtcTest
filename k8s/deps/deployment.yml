@@ -56,6 +56,7 @@ spec:
       containers:
         - name: signaling-server-pod
           image: endienasg/web-rtc-room-service:pr-7
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
 ---

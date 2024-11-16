@@ -19,9 +19,9 @@ export default function Home() {
   return (
       <div className="flex flex-col h-[100vh]">
           <Header/>
-          <div className="flex justify-center items-center bg-gray-100 h-full ">
-              <div className="w-full max-w-sm p-6 bg-white rounded-lg shadow-md ">
-                  <h1 className="text-2xl font-semibold text-center mb-6">Кто ты?</h1>
+          <div className="flex justify-center items-center h-full bg-gray-100">
+              <div className="w-full max-w-sm p-6 bg-white rounded-lg shadow-md">
+                  <h1 className="text-2xl font-semibold text-center mb-6 text-black">Кто ты?</h1>
                   <form className="h-[200px]">
                       <button
                           type="button"

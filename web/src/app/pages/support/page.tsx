@@ -12,11 +12,11 @@ export default function FSupport(){
         }
     };
     return(
-        <div>
+        <div className="flex flex-col h-[100vh]">
             <Header/>
-            <div className="flex justify-center items-center h-[94vh]">
+            <div className="flex justify-center items-center h-full bg-gray-100">
                 <div className="w-full max-w-sm p-6 bg-white rounded-lg shadow-md bg-[F0F4F8]">
-                    <h1 className="text-2xl font-semibold text-center mb-6">Авторизация</h1>
+                    <h1 className="text-2xl font-semibold text-center mb-6 text-black ">Авторизация</h1>
                     <form>
                         <div className="mb-4">
                             <label htmlFor="login" className="block text-gray-700 font-medium mb-1">

@@ -1,11 +1,12 @@
 package ru.foxstudios.service
 
+import io.ktor.server.application.*
 import io.ktor.websocket.*
 import ru.foxstudios.controller.objectMapper
 import ru.foxstudios.domain.Message
 import ru.foxstudios.domain.MessageType
 
-class WsService {
+class WsService(var module: Application) {
     suspend fun resolveMove(
         message: Message,
         connections: HashMap<String, WebSocketSession>,
@@ -19,15 +20,13 @@ class WsService {
                     if (message.room != null) {
                         if (!rooms.contains(message.room)) {
                             rooms[message.room!!] = ArrayList<String>()
-                            rooms[message.room!!]!!.add(client)
                         }
+                        rooms[message.room!!]!!.add(client)
 
                         for (otherClient in rooms[message.room!!]!!) {
-                            if (otherClient != client) {
-                                val localMessage = Message(MessageType.user_joined, null, message.room!!)
-                                val resultMessage = objectMapper.writeValueAsString(localMessage)
-                                connections[otherClient]?.send(resultMessage)
-                            }
+                            val localMessage = Message(MessageType.user_joined, null, message.room!!)
+                            val resultMessage = objectMapper.writeValueAsString(localMessage)
+                            connections[otherClient]?.send(resultMessage)
                         }
                     }
                 }
@@ -35,7 +34,9 @@ class WsService {
                 else -> {
                     for (otherClient in rooms[message.room!!]!!) {
                         if (otherClient != client) {
-                            connections[otherClient]?.send(objectMapper.writeValueAsString(message))
+                            val rawMessage = objectMapper.writeValueAsString(message)
+                            module.log.info("HERE $rawMessage")
+                            connections[otherClient]?.send(rawMessage)
                         }
                     }
                 }

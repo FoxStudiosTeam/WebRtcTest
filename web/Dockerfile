@@ -1,8 +1,11 @@
-FROM node:18-alpine as build
+FROM node:19-alpine AS build
 WORKDIR /web_app
-COPY package*.json ./
+COPY web/package*.json ./
+COPY web/tsconfig.json ./tsconfig.json
+COPY web/next.config.ts ./next.config.ts
 RUN npm install
-COPY . .
+COPY ./web ./
+#ENTRYPOINT ["sleep", "10000"]
 RUN npm run build
 WORKDIR /runtime
 FROM node:18-alpine

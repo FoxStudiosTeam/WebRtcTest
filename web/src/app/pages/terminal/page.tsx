@@ -1,10 +1,11 @@
 "use client"
 
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import Image from "next/image";
 import loading from "@/assets/loading.svg"
 
-export function FTerminal(){
+export default function FTerminal(){
     return(
         <div className="bg-[#F0F4F8] flex flex-col justify-center h-[100vh]">
             <p className="font-bold text-[50px] text-black w-full text-center">

@@ -1,7 +1,6 @@
 "use client"
 
 import {Header} from "@/app/components/header";
-import Link from "next/link";
 import Image from "next/image";
 import stat from "@/assets/stat.svg";
 export default function Terminals() {

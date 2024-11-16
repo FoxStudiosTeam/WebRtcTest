@@ -11,6 +11,6 @@ RUN gradle build
 FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /runtime
-COPY --from=builder /tmp/build/libs/room-service-0.0.1-SNAPSHOT.jar /runtime
+COPY --from=builder /tmp/build/libs/room-service-0.0.1.jar /runtime
 
-ENTRYPOINT ["java","-jar","/runtime/signaling-server-1.0-SNAPSHOT.jar"]
+ENTRYPOINT ["java","-jar","/runtime/room-service-0.0.1.jar"]

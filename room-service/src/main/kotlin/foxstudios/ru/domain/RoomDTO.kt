@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RoomDTO(
-    val uuid: String? = null,
+    var uuid: String? = null,
     val name: String,
     val physicalAddress: String,
     var state: RoomState,

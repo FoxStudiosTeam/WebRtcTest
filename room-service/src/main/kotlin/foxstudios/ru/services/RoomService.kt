@@ -2,11 +2,13 @@ package foxstudios.ru.services
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import foxstudios.ru.coroutineScope
+import foxstudios.ru.domain.MessageDTO
 import foxstudios.ru.domain.RoomDAO
 import foxstudios.ru.domain.RoomDTO
 import io.ktor.server.application.*
 import kotlinx.coroutines.withContext
 import java.sql.Connection
+import java.sql.ResultSet
 
 class RoomService(private val connection: Connection, val module: Application, val mapper: ObjectMapper) {
 
@@ -25,7 +27,8 @@ class RoomService(private val connection: Connection, val module: Application, v
         room.apply {
             //withContext(Dispatchers.IO) -> IO / can lock io processes (MAIN /
             withContext(coroutineScope.coroutineContext) {
-                val query = "insert into rooms (uuid, name,state,  physicalAddress, clientUid, operatorUid) values ('${room.uuid}','${room.name}','${room.state}','${room.physicalAddress}','${room.clientUid}', '${room.operatorUid}')"
+                val query =
+                    "insert into rooms (uuid, name,state,  physicalAddress, clientUid, operatorUid) values ('${room.uuid}','${room.name}','${room.state}','${room.physicalAddress}','${room.clientUid}', '${room.operatorUid}')"
                 module.log.info(query)
                 val statement = connection.prepareStatement(query)
                 statement.executeUpdate()
@@ -39,4 +42,46 @@ class RoomService(private val connection: Connection, val module: Application, v
 
         return listOf("test", "test")
     }
+
+    suspend fun deleteRoom(uuid: String): MessageDTO {
+        var flag = false
+
+        withContext(coroutineScope.coroutineContext) {
+            val deleteQuery = "delete from rooms where uuid = '$uuid'"
+            module.log.info(deleteQuery)
+            val deleteStatement = connection.prepareStatement(deleteQuery)
+            deleteStatement.executeUpdate()
+            deleteStatement.close()
+
+            val checkQuery = "select count(1) from rooms where uuid = '$uuid'"
+            val checkStatement = connection.prepareStatement(checkQuery)
+            val resultSet: ResultSet = checkStatement.executeQuery()
+            if (resultSet.next()) {
+                flag = resultSet.getInt(1) > 0
+            }
+
+            resultSet.close()
+            checkStatement.close()
+        }
+        val result = !flag
+        return MessageDTO("$result")
+    }
+
+    suspend fun updateRoom(uuid: String, body: String): RoomDTO {
+        val rawRoom = mapper.readValue(body, RoomDTO::class.java)
+        rawRoom.uuid = uuid
+        val room = RoomDAO.fromDTO(rawRoom)
+        room.apply {
+            withContext(coroutineScope.coroutineContext) {
+                val query =
+                    "update rooms set state='${rawRoom.state}', operatorUid='${rawRoom.operatorUid}', clientUid = '${rawRoom.clientUid}' where uuid = '$uuid'"
+                module.log.info(query)
+                val statement = connection.prepareStatement(query)
+                statement.executeUpdate()
+                statement.close()
+            }
+        }
+        return RoomDTO.fromDAO(room)
+    }
+
 }

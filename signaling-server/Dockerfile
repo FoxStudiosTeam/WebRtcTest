@@ -4,8 +4,9 @@ LABEL authors="AgniaEndie"
 
 EXPOSE 8080
 
-WORKDIR /tmp
+
 COPY . /tmp
+WORKDIR /tmp
 
 RUN gradle test
 

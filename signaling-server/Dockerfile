@@ -4,7 +4,7 @@ LABEL authors="AgniaEndie"
 
 EXPOSE 8080
 
-COPY . /tmp
+COPY signaling-server/. /tmp
 WORKDIR /tmp
 
 RUN gradle build

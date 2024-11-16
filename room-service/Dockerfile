@@ -10,6 +10,10 @@ WORKDIR /tmp
 RUN gradle buildFatJar --no-daemon
 FROM eclipse-temurin:17-jre-alpine
 
+ENV postgres_url=""
+ENV postgres_user=""
+ENV postgres_password=""
+
 WORKDIR /runtime
 COPY --from=builder /tmp/build/libs/room-service-all.jar /runtime
 

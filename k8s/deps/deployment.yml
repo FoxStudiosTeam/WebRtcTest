@@ -59,6 +59,22 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
+          env:
+            - name: postgres_url
+              valueFrom:
+                secretKeyRef:
+                  key: pg-url
+                  name: postgres-secret
+            - name: postgres_user
+              valueFrom:
+                secretKeyRef:
+                  key: pg-user
+                  name: postgres-secret
+            - name: postgres_password
+              valueFrom:
+                secretKeyRef:
+                  key: pg-password
+                  name: postgres-secret
 ---
 #Service (Networking) of Signaling server (RFC-8835) TODO: replace it with normal in-cluster solution)
 apiVersion: v1

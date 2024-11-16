@@ -5,6 +5,7 @@ import { Header } from "@/app/components/header";
 import Image from "next/image";
 import stat from "@/assets/stat.svg";
 import axios from "axios";
+import Link from "next/link";
 
 interface Room {
     uuid: string;
@@ -21,7 +22,7 @@ export default function Terminals() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        axios.get("http://localhost:8080/api/v1/rooms/all").then((response) => {
+        axios.get("http://localhost:30009/api/v1/rooms/all").then((response) => {
                 setRooms(response.data);
                 setLoading(false);
             }).catch((error) => {
@@ -44,9 +45,11 @@ export default function Terminals() {
             <Header />
             <div className="flex flex-row flex-wrap justify-center h-[94vh]">
                 {rooms.map((room) => (
-                    <div
+                    <Link
+                        href={`/pages/support/terminals/${room.uuid}`}
                         key={room.uuid}
                         className="rounded-[10px] w-[300px] m-5 h-[200px] shadow-xl transition duration-150 ease-in-out sm:hover:scale-105"
+
                     >
                         <div className="grid grid-rows-3 gap-1 h-full">
                             <h2 className="text-base font-bold truncate flex items-center justify-center">
@@ -62,7 +65,7 @@ export default function Terminals() {
                                 </p>
                             </div>
                         </div>
-                    </div>
+                    </Link>
                 ))}
             </div>
         </div>

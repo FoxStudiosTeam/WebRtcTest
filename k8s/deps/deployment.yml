@@ -55,7 +55,7 @@ spec:
     spec:
       containers:
         - name: signaling-server-pod
-          image: endienasg/web-rtc-room-service:master
+          image: endienasg/web-rtc-room-service:pr-7
           ports:
             - containerPort: 8080
 ---

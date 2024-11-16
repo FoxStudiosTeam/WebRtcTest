@@ -1,11 +1,11 @@
 "use client"
 
-import FSupport from "@/app/pages/support/page";
+import SocketCamera from "@/app/components/socket_cam";
 
 export default function Home() {
   return (
       <div>
-          <FSupport/>
+          <SocketCamera/>
       </div>
   );
 }

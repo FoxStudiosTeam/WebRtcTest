@@ -7,9 +7,7 @@ EXPOSE 8080
 COPY . /tmp
 WORKDIR /tmp
 
-RUN chmod +x /tmp/gradlew
-RUN /tmp/gradlew jar
-
+RUN gradle build
 FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /runtime

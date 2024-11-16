@@ -2,6 +2,7 @@ package foxstudios.ru.routes
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import foxstudios.ru.config.connectToPostgres
+import foxstudios.ru.domain.MessageDTO
 import foxstudios.ru.services.RoomService
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -20,7 +21,10 @@ fun Route.roomRoutes(apiTitle: String, module: Application, mapper: ObjectMapper
     get("$apiTitle/rooms/get/{id}") {
         val id = call.parameters["id"]!!
         val result = roomService.getOne(id)
-        call.respond(result)
+        if (result != null) {
+            call.respond(result)
+        }
+        call.respond(MessageDTO("не найдено"))
     }
     post("$apiTitle/rooms/create") {
         val result = roomService.createRoom(call.receive<String>())

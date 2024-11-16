@@ -86,6 +86,23 @@ curl --request GET \
 
 ---
 
+### Получение комнаты
+
+```http
+GET http://localhost:8080/api/v1/rooms/get/<uid>
+```
+
+```
+curl --request GET \
+  --url http://localhost:8080/api/v1/rooms/get/<uid> \
+  --header 'User-Agent: insomnia/10.1.1'
+```
+| Параметр | Значение                                               |
+|----------|--------------------------------------------------------|
+| uid      | уникальный идентификатор комнаты которую нужно удалить |
+
+---
+
 ### Удаление комнаты
 
 ```http

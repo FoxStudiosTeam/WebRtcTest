@@ -5,10 +5,12 @@ import foxstudios.ru.coroutineScope
 import foxstudios.ru.domain.MessageDTO
 import foxstudios.ru.domain.RoomDAO
 import foxstudios.ru.domain.RoomDTO
+import foxstudios.ru.domain.RoomState
 import io.ktor.server.application.*
 import kotlinx.coroutines.withContext
 import java.sql.Connection
 import java.sql.ResultSet
+import java.util.*
 
 class RoomService(private val connection: Connection, val module: Application, val mapper: ObjectMapper) {
 
@@ -37,10 +39,45 @@ class RoomService(private val connection: Connection, val module: Application, v
         return RoomDTO.fromDAO(room)
     }
 
-    fun getAll(): List<Any> {
+    suspend fun getAll(): List<RoomDTO> {
+        val rooms = mutableListOf<RoomDTO>()
+        withContext(coroutineScope.coroutineContext) {
+            val query = "select * from rooms"
+            module.log.info(query)
+            val statement = connection.prepareStatement(query)
+            val result = statement.executeQuery()
 
+            while (result.next()) {
+                var uuid = result.getString("uuid")
+                var name = result.getString("name")
+                var physicalAddress = result.getString("physicalAddress")
+                var state = RoomState.valueOf(result.getString("state"))
+                var clientUid = result.getString("clientUid")
+                var operatorUid = result.getString("operatorUid")
+                rooms.add(RoomDTO(uuid,name,physicalAddress,state,clientUid,operatorUid))
+            }
+        }
+        return rooms
+    }
+    suspend fun getOne(uuid: String): RoomDTO? {
+        var room: RoomDTO? = null
+        withContext(coroutineScope.coroutineContext) {
+            val query = "select * from rooms where uuid = '$uuid'"
+            module.log.info(query)
+            val statement = connection.prepareStatement(query)
+            val result = statement.executeQuery()
 
-        return listOf("test", "test")
+            while (result.next()) {
+                var uuid = result.getString("uuid")
+                var name = result.getString("name")
+                var physicalAddress = result.getString("physicalAddress")
+                var state = RoomState.valueOf(result.getString("state"))
+                var clientUid = result.getString("clientUid")
+                var operatorUid = result.getString("operatorUid")
+                room = RoomDTO(uuid,name,physicalAddress,state,clientUid,operatorUid)
+            }
+        }
+        return room
     }
 
     suspend fun deleteRoom(uuid: String): MessageDTO {

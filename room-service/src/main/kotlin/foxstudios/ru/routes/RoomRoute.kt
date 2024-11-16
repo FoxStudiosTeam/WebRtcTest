@@ -17,6 +17,11 @@ fun Route.roomRoutes(apiTitle: String, module: Application, mapper: ObjectMapper
         val result = roomService.getAll()
         call.respond(result)
     }
+    get("$apiTitle/rooms/get/{id}") {
+        val id = call.parameters["id"]!!
+        val result = roomService.getOne(id)
+        call.respond(result)
+    }
     post("$apiTitle/rooms/create") {
         val result = roomService.createRoom(call.receive<String>())
         call.respond(result)

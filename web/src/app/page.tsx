@@ -1,11 +1,12 @@
 "use client"
 
-import Camera from "@/app/components/cam";
+
+import {FTerminal} from "@/app/pages/terminal/page";
 
 export default function Home() {
   return (
       <div>
-          <Camera/>
+          <FTerminal/>
       </div>
   );
 }

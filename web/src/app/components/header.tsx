@@ -7,7 +7,7 @@ export function Header(){
             <div className="flex items-center min-w-[20%] text-[#f8f9fa]">
                 <h1 className="font-[500] text-[20px] mx-5">SevenSupport</h1>
                 <Link href="/" className="mx-5">Главная</Link>
-                <Link href="#" className="mx-5">Терминалы</Link>
+                <Link href="/pages/support/terminals" className="mx-5">Терминалы</Link>
             </div>
         </div>
     );

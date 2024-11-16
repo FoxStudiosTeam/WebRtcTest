@@ -2,6 +2,45 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: connector-server-deployment
+spec:
+  selector:
+    matchLabels:
+      app: connector-server
+  template:
+    metadata:
+      labels:
+        app: connector-server
+    spec:
+      containers:
+        - name: connector-server-pod
+          image: endienasg/web-rtc-ws-connector-service:master
+          ports:
+            - containerPort: 8080
+---
+#Service (Networking) of Signaling server (RFC-8835) TODO: replace it with normal in-cluster solution)
+apiVersion: v1
+kind: Service
+metadata:
+  name: connector-server-service
+  labels:
+    env: prod
+    owner: endienasg
+spec:
+  type: NodePort
+  selector:
+    app: connector-server
+  ports:
+    - name: http
+      protocol: TCP
+      port: 5000
+      targetPort: 8080
+      nodePort: 30010
+---
+#Deployment of Signaling server (RFC-8835)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: signaling-server-deployment
 spec:
   selector:

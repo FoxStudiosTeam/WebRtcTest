@@ -30,6 +30,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Run Gradle tests
+        uses: actions/checkout@v4
         run: ./gradlew test
 
       - name: Log in to Docker Hub

@@ -8,8 +8,9 @@ interface WebRTCMessage {
 
 const configuration: RTCConfiguration = {
     iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' }
+        //{ urls: 'stun:kaiv.space:8100' }
+        //{ urls: 'stun:stun.l.google.com:19302' },
+       // { urls: 'stun:stun1.l.google.com:19302' }
     ]
 };
 

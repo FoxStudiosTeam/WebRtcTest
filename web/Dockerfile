@@ -8,7 +8,7 @@ COPY ./web ./
 #ENTRYPOINT ["sleep", "10000"]
 RUN npm run build
 WORKDIR /runtime
-FROM node:18-alpine
+FROM node:19-alpine
 COPY --from=build /web_app/.next/standalone ./
 COPY --from=build  /web_app/.next/static ./.next/static
 EXPOSE 3000

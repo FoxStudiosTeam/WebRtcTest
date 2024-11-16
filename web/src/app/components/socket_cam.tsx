@@ -36,6 +36,8 @@ export default function WebRTCChat() {
     const wsRef = useRef<WebSocket | null>(null);
     const localStreamRef = useRef<MediaStream | null>(null);
     
+    const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
+
     const clientId = useRef(`client_${Math.random().toString(36).substr(2, 9)}`);
 
     const sendMessage = (message: WebRTCMessage) => {
@@ -215,6 +217,21 @@ export default function WebRTCChat() {
         }
     };
 
+    const addVolume = () => {
+        setVolume(clamp(volume + 0.1, 0, 2));
+        if (gainNodeRef.current) {
+            gainNodeRef.current.gain.value = volume;
+        }
+    };
+
+    const decVolume = () => {
+        setVolume(clamp(volume - 0.1, 0, 2));
+        if (gainNodeRef.current) {
+            gainNodeRef.current.gain.value = volume;
+        }
+    };
+
+
     useEffect(() => {
         return () => {
             localStreamRef.current?.getTracks().forEach(track => track.stop());
@@ -257,16 +274,18 @@ export default function WebRTCChat() {
             </div>
 
             <button
-                    className='bg-[#DC362E] w-[100px] h-[100px] rounded-[10px] text-2xl shadow-xl font-bold flex 
+                    className='bg-[#004899] w-[120px] h-[60px] rounded-[10px] text-2xl shadow-xl font-bold flex 
                     justify-center items-center gap-2 absolute top-[10px] right-[10px]'
                     disabled={!localStreamRef.current}
+                    onClick={addVolume}
                 >
                     ГРОМЧЕ
             </button>
             <button
-                    className='bg-[#DC362E] w-[100px] h-[100px] rounded-[10px] text-2xl shadow-xl font-bold flex 
-                    justify-center items-center gap-2 absolute top-[10px] right-[120px]'
+                    className='bg-[#DC362E] w-[120px] h-[60px] rounded-[10px] text-2xl shadow-xl font-bold flex 
+                    justify-center items-center gap-2 absolute top-[10px] right-[140px]'
                     disabled={!localStreamRef.current}
+                    onClick={decVolume}
                 >
                     ТИШЕ
             </button>

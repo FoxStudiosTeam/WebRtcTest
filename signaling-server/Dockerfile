@@ -7,7 +7,8 @@ EXPOSE 8080
 COPY . /tmp
 WORKDIR /tmp
 
-RUN gradle jar
+RUN chmod +x /tmp/gradlew
+RUN /tmp/gradlew jar
 
 FROM eclipse-temurin:17-jre-alpine
 

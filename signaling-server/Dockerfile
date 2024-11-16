@@ -4,13 +4,10 @@ LABEL authors="AgniaEndie"
 
 EXPOSE 8080
 
+COPY signaling-server/. /tmp
 WORKDIR /tmp
-COPY . /tmp
 
-RUN gradle test
-
-RUN gradle jar
-
+RUN gradle build
 FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /runtime

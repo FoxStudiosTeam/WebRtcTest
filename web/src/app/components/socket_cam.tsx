@@ -38,6 +38,11 @@ export default function WebRTCChat() {
     
     const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
+    const volumeStep = 0.1;
+    const volumeMax = 2.0;
+    const volumeMin = 0.0;
+
+
     const clientId = useRef(`client_${Math.random().toString(36).substr(2, 9)}`);
 
     const sendMessage = (message: WebRTCMessage) => {
@@ -218,14 +223,14 @@ export default function WebRTCChat() {
     };
 
     const addVolume = () => {
-        setVolume(clamp(volume + 0.1, 0, 2));
+        setVolume(clamp(volume + volumeStep, volumeMin, volumeMax));
         if (gainNodeRef.current) {
             gainNodeRef.current.gain.value = volume;
         }
     };
 
     const decVolume = () => {
-        setVolume(clamp(volume - 0.1, 0, 2));
+        setVolume(clamp(volume - volumeStep, volumeMin, volumeMax));
         if (gainNodeRef.current) {
             gainNodeRef.current.gain.value = volume;
         }
@@ -246,17 +251,27 @@ export default function WebRTCChat() {
                     playsInline
                     muted
                 />*/
-    return (
-        <div className='absolute bg-green-500 w-full h-full'>
-            
-            <div className="w-full bg-white absolute h-full">
+    /*
+    
+    <div className="w-full h-full bg-red-500 absolute">
                 <video className='w-full h-full object-contain'
                     ref={remoteVideoRef}
                     autoPlay
                     playsInline
                 />
             </div>
-            <div className="w-[200px] bg-white h-[200px] absolute top-[30px] left-[30px]">
+    */
+    return (
+        <div className='absolute bg-green-500 w-full h-full'>
+            <div className="w-full h-full bg-white absolute">
+                <video className='w-full h-[100vh] object-contain'
+                    ref={remoteVideoRef}
+                    autoPlay
+                    playsInline
+                />
+            </div>
+            
+            <div className="w-[200px] h-[200px] absolute top-[30px] left-[30px]">
                 <video className='w-full h-full object-contain'
                     ref={localVideoRef}
                     autoPlay
@@ -264,14 +279,7 @@ export default function WebRTCChat() {
                     muted
                 />
             </div>
-            <div className="video-container container relative flex">
-                <div className='w-[100%] h-[100%] bg-red-500'></div>
-                <video className='hidden'
-                    ref={remoteVideoRef}
-                    autoPlay
-                    playsInline
-                />
-            </div>
+
 
             <button
                     className='bg-[#004899] w-[120px] h-[60px] rounded-[10px] text-2xl shadow-xl font-bold flex 
@@ -318,9 +326,9 @@ export default function WebRTCChat() {
                 <Reset/>
                 <input
                     type="range"
-                    min="0"
-                    max="2"
-                    step="0.01"
+                    min={`${volumeMin}`}
+                    max={`${volumeMax}`}
+                    step={`${volumeStep}`}
                     value={volume}
                     onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
                     className="

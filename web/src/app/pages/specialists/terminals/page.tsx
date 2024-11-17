@@ -70,7 +70,7 @@ export default function Terminals() {
             console.error("Ошибка при выполнении запроса:", error);
         }
     };
-    const handleLL = (room) => {
+    const handleLL = (room: Room) => {
         updateRoomStatus("FULL",room);
     };
 

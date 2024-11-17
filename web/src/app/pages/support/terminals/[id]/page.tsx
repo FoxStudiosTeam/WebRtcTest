@@ -6,7 +6,7 @@ import { Header } from "@/app/components/header";
 import axios from "axios";
 import {MicOff} from "@/app/components/micOff";
 import {MicOn} from "@/app/components/micOn";
-import {Reset} from "@/app/components/reset";
+import {Reset} from "@/app/components/reset mini";
 import {VolPlus} from "@/app/components/volPlus mini";
 import {VolMinus} from "@/app/components/volMinus mini";
 import {CamOnMini} from "@/app/components/camOn mini";

@@ -72,10 +72,6 @@ export default function CallRoom1() {
         }
     };
 
-    useEffect(() => {
-        handleStartCamera();
-    }, []);
-
     const handleEndCall = () => {+
         sendMessage({
             type: 'disconnect',

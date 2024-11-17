@@ -31,14 +31,24 @@ fun Application.configureSerialization() {
 fun Application.configureHTTP() {
     install(DefaultHeaders) {
         header("X-Engine", "Ktor") // will send this header with each response
+        header("Access-Control-Allow-Origin","*")
+        header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+        //TODO -> security problems
+        header("Access-Controle-Allow-Headers", "*")
     }
-    install(CORS) {
-        allowMethod(HttpMethod.Options)
-        allowMethod(HttpMethod.Put)
-        allowMethod(HttpMethod.Delete)
-        allowMethod(HttpMethod.Patch)
-        allowHeader(HttpHeaders.Authorization)
-        allowHeader("MyCustomHeader")
-        anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
-    }
+    //`123
+//    install(CORS) {
+//        allowMethod(HttpMethod.Options)
+//        allowMethod(HttpMethod.Put)
+//        allowMethod(HttpMethod.Delete)
+//        allowMethod(HttpMethod.Patch)
+//        allowMethod(HttpMethod.Post)
+//        allowMethod(HttpMethod.Get)
+//
+//        allowHeader(HttpHeaders.Authorization)
+//        allowHeader(HttpHeaders.ContentType)
+//        allowHeader(HttpHeaders.Accept)
+//
+//        anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
+//    }
 }

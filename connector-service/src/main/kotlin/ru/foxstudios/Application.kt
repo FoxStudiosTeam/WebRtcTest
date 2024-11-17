@@ -14,7 +14,6 @@ fun main(args: Array<String>) {
 fun Application.module() {
     configureHTTP()
     configureSerialization()
-    configureRouting()
     install(WebSockets) {
         pingPeriod = 15.seconds
         timeout = 500.milliseconds

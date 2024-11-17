@@ -5,5 +5,7 @@ enum class MessageType {
     offer,
     answer,
     `ice-candidate`,
-    `user_joined`
+    `user_joined`,
+    disconnect,
+    `user_left`
 }

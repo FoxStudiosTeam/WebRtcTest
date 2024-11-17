@@ -3,7 +3,6 @@ package foxstudios.ru
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import foxstudios.ru.config.configureHTTP
 import foxstudios.ru.config.configureSerialization
-import foxstudios.ru.config.connectToPostgres
 import foxstudios.ru.routes.roomRoutes
 import io.ktor.server.application.*
 import io.ktor.server.engine.*

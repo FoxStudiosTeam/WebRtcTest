@@ -334,14 +334,14 @@ export default function RoomTerminal() {
     return (
         <div className='absolute bg-green-500 w-full h-full'>
             <div className="w-full h-full bg-white absolute">
-                <video className='w-full h-[100vh] object-contain'
+                <video className='w-full h-fit object-contain'
                        ref={remoteVideoRef}
                        autoPlay
                        playsInline
                 />
             </div>
 
-            <div className="w-[200px] h-[200px] absolute top-[30px] left-[30px]">
+            <div className="w-[200px] h-[200px] absolute top-[30px] left-[30px] rounded-[40px]">
                 <video className='w-full h-full object-contain'
                        ref={localVideoRef}
                        autoPlay
@@ -350,9 +350,8 @@ export default function RoomTerminal() {
                 />
             </div>
 
-
             <button
-                className='bg-[#004899] w-[120px] h-[60px] rounded-[10px] text-2xl shadow-xl font-bold flex text-white
+                className='bg-[#004899] w-[120px] h-[60px] rounded-[10px] text-2xl flex text-white
                     justify-center items-center gap-2 absolute top-[10px] right-[10px]'
                 disabled={!localStreamRef.current}
                 onClick={addVolume}
@@ -360,7 +359,7 @@ export default function RoomTerminal() {
                 ГРОМЧЕ
             </button>
             <button
-                className='bg-[#DC362E] w-[120px] h-[60px] rounded-[10px] text-2xl shadow-xl font-bold flex text-white
+                className='bg-[#DC362E] w-[120px] h-[60px] rounded-[10px] text-2xl flex text-white
                     justify-center items-center gap-2 absolute top-[10px] right-[140px]'
                 disabled={!localStreamRef.current}
                 onClick={decVolume}
@@ -385,13 +384,13 @@ export default function RoomTerminal() {
                     className='absolute left-0 top-[-4rem] bg-green-500 text-red-500 text-center rounded'
                     onClick={handleStartCamera}>Start Camera
                 </button>
-                <button
-                    className='bg-[#DC362E] w-[372px] h-[77px] rounded-[10px] text-2xl shadow-xl font-bold flex justify-center items-center gap-2 text-white'
-                    onClick={handleToggleVideo}
-                    disabled={!localStreamRef.current}
-                >
-                    {isVideoMuted ? 'Вас не видно' : 'Вас видно'}
-                </button>
+                {/*<button*/}
+                {/*    className='bg-[#DC362E] w-[372px] h-[77px] rounded-[10px] text-2xl shadow-xl font-bold flex justify-center items-center gap-2 text-white'*/}
+                {/*    onClick={handleToggleVideo}*/}
+                {/*    disabled={!localStreamRef.current}*/}
+                {/*>*/}
+                {/*    {isVideoMuted ? 'Вас не видно' : 'Вас видно'}*/}
+                {/*</button>*/}
                 {isAudioMuted ? <MicOff onclick={handleToggleAudio}/> : <MicOn onclick={handleToggleAudio}/>}
                 <Reset onclick={handleEndCall}/>
                 <input
@@ -404,7 +403,7 @@ export default function RoomTerminal() {
                     className="
                     w-[200px] rotate-[-90deg] absolute right-[-80px] bottom-[190px]
                     h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700
-                    scale-[2]
+                    scale-[2] hidden
                     "
                 />
             </div>

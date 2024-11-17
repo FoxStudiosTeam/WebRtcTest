@@ -169,6 +169,14 @@ export default function CallRoom() {
                 localVideoRef.current.srcObject = stream;
             }
             
+            // Set initial track states
+            stream.getVideoTracks().forEach(track => {
+                track.enabled = !isVideoMuted;
+            });
+            stream.getAudioTracks().forEach(track => {
+                track.enabled = !isAudioMuted;
+            });
+            
             if (peerConnectionRef.current) {
                 localStreamRef.current?.getTracks().forEach(track => {
                     peerConnectionRef.current?.addTrack(track, localStreamRef.current!);
@@ -204,6 +212,7 @@ export default function CallRoom() {
                         if (remoteVideoRef.current) {
                             remoteVideoRef.current.srcObject = null;
                         }
+                        handleEndCall();
                         break;
                     case 'user_joined':
                         console.log("User joined, creating offer");
@@ -278,10 +287,17 @@ export default function CallRoom() {
 
     const handleToggleVideo = () => {
         if (localStreamRef.current) {
-            localStreamRef.current.getVideoTracks().forEach(track => {
+            const videoTracks = localStreamRef.current.getVideoTracks();
+            videoTracks.forEach(track => {
                 track.enabled = isVideoMuted;
             });
             setIsVideoMuted(!isVideoMuted);
+            
+            // Force video element update
+            if (localVideoRef.current) {
+                localVideoRef.current.srcObject = null;
+                localVideoRef.current.srcObject = localStreamRef.current;
+            }
         }
     };
 
@@ -307,17 +323,12 @@ export default function CallRoom() {
     };
 
 
-    //useEffect(() => {
-    //    return () => {
-    //        localStreamRef.current?.getTracks().forEach(track => track.stop());
-    //        peerConnectionRef.current?.close();
-    //        wsRef.current?.close();
-    //    };
-    //}, []);
-
+    
     useEffect(() => {
         const roomId = params?.id;
-        
+        localStreamRef.current?.getTracks().forEach(track => track.stop());
+        peerConnectionRef.current?.close();
+        wsRef.current?.close();
         // Create an async function inside useEffect
         const initCamera = async () => {
             await handleStartCamera();

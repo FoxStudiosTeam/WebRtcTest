@@ -64,7 +64,7 @@ export default function Terminals() {
                 }),
             });
             if (response.status === 200) {
-                router.push("/pages/terminal/");
+
             } else {
                 console.error("Ошибка при обновлении комнаты:", response.data);
             }

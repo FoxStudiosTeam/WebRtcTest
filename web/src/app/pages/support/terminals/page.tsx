@@ -49,8 +49,8 @@ export default function Terminals() {
         return () => clearInterval(interval);
     }, []);
 
-    const updateRoomStatus = async (newState: string, room) => {
-        if (!rooms) return;
+    const updateRoomStatus = async (newState: string, room: Room) => {
+        if (!room) return;
 
         try {
             const response = await fetch(`http://foxstudios.ru:30009/api/v1/rooms/update/${room.uuid}`, {
@@ -60,20 +60,19 @@ export default function Terminals() {
                     physicalAddress: room.physicalAddress,
                     state: newState,
                     clientUid: room.clientUid,
-                    operatorUid: room.operatorUid
+                    operatorUid: room.operatorUid,
                 }),
             });
-            if (response.status === 200) {
 
-            } else {
-                console.error("Ошибка при обновлении комнаты:", response.data);
+            if (response.ok) {
+                router.push(`/pages/support/terminals/${room.uuid}`)
             }
         } catch (error) {
             console.error("Ошибка при выполнении запроса:", error);
         }
     };
-    const handleLL = () => {
-        updateRoomStatus("FULL",rooms);
+    const handleLL = (room) => {
+        updateRoomStatus("FULL",room);
     };
 
     if (loading) {
@@ -101,7 +100,10 @@ export default function Terminals() {
             <div className="flex overflow-scroll flex-row flex-wrap justify-center h-full bg-gray-100">
                 {filteredRooms.map((room) => (
                     <Link
-                        onClick={handleLL}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            handleLL(room);
+                        }}
                         href={`/pages/support/terminals/${room.uuid}`}
                         key={room.uuid}
                         className="rounded-[10px] w-[300px] m-5 h-[200px] shadow-xl transition duration-150 ease-in-out sm:hover:scale-105"

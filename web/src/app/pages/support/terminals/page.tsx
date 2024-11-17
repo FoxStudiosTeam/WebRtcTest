@@ -69,7 +69,7 @@ export default function Terminals() {
     return (
         <div className="flex flex-col h-[100vh]">
             <Header />
-            <div className="flex flex-row flex-wrap justify-center h-full bg-gray-100">
+            <div className="flex overflow-scroll flex-row flex-wrap justify-center h-full bg-gray-100">
                 {filteredRooms.map((room) => (
                     <Link
                         href={`/pages/support/terminals/${room.uuid}`}
@@ -77,7 +77,7 @@ export default function Terminals() {
                         className="rounded-[10px] w-[300px] m-5 h-[200px] shadow-xl transition duration-150 ease-in-out sm:hover:scale-105"
 
                     >
-                        <div className="grid grid-rows-3 gap-1 h-full">
+                        <div className="grid grid-rows-3 gap-1 h-full bg-white rounded-[10px]">
                             <h2 className="text-base text-gray-700 font-bold truncate flex items-center justify-center">
                                 {room.name}
                             </h2>

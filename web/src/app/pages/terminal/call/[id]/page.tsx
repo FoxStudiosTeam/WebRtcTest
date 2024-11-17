@@ -64,15 +64,12 @@ export default function RoomTerminal() {
         }
     };
 
-    useEffect(() => {
-        handleStartCamera();
-    }, []);
-
     const handleEndCall = () => {+
         sendMessage({
             type: 'disconnect',
             room: roomId
         });
+
         // Закрываем WebSocket
         wsRef.current?.close();
         wsRef.current = null;
@@ -289,34 +286,33 @@ export default function RoomTerminal() {
         }
     };
 
-
-    useEffect(() => {
-        return () => {
-            localStreamRef.current?.getTracks().forEach(track => track.stop());
-            peerConnectionRef.current?.close();
-            wsRef.current?.close();
-        };
-    }, []);
-
     useEffect(() => {
         const roomUid = param?.id;
+        if (localStreamRef.current) {
+            localStreamRef.current.getTracks().forEach(track => track.stop());
+        }
+        peerConnectionRef.current?.close();
+        wsRef.current?.close();
+        const initCamera = async () => {
+            await handleStartCamera();
+            if (!roomUid) return;
+            axios
+                .get(`http://foxstudios.ru:30009/api/v1/rooms/get/${roomUid}`)
+                .then((response) => {
+                    setRoom(response.data);
+                    setLoading(false);
+                    if (!wsRef.current) {
+                        handleJoinRoom();
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error fetching room details:", error);
+                    setError("Не удалось загрузить данные.");
+                    setLoading(false);
+                });
+        };
+        initCamera();
 
-        if (!roomUid) return;
-
-        axios
-            .get(`http://foxstudios.ru:30009/api/v1/rooms/get/${roomUid}`)
-            .then((response) => {
-                setRoom(response.data);
-                setLoading(false);
-                if (!wsRef.current) {
-                    handleJoinRoom();
-                }
-            })
-            .catch((error) => {
-                console.error("Error fetching room details:", error);
-                setError("Не удалось загрузить данные.");
-                setLoading(false);
-            });
     }, [param?.id]);
 
     if (loading) {

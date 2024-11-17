@@ -299,13 +299,13 @@ export default function CallRoom1() {
         }
     };
 
-    useEffect(() => {
-        return () => {
-            localStreamRef.current?.getTracks().forEach(track => track.stop());
-            peerConnectionRef.current?.close();
-            wsRef.current?.close();
-        };
-    }, []);
+    //useEffect(() => {
+    //    return () => {
+    //        localStreamRef.current?.getTracks().forEach(track => track.stop());
+    //        peerConnectionRef.current?.close();
+    //        wsRef.current?.close();
+    //    };
+    //}, []);
 
     useEffect(() => {
         const roomId = params?.id;

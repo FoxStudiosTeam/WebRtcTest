@@ -1,6 +1,8 @@
 ### Документация по проекту RoomService
 
 Версия апи: v1
+<br> Тестовое окружение: `http://foxstudios.ru:30009`
+<br> Локальное окружение: `http://localhost:8080`
 
 ---
 Пример формирования адреса:
@@ -130,13 +132,13 @@ Status Code = 200 OK
 ### Удаление комнаты
 
 ```http
-DELETE http://localhost:8080/api/v1/rooms/delete/<uid>
+GET http://localhost:8080/api/v1/rooms/delete/<uid>
 ```
 
 ### Запрос:
 
 ```curl
-curl --request DELETE \
+curl --request GET \
   --url http://localhost:8080/api/v1/rooms/delete/<uid> \
   --header 'User-Agent: insomnia/10.1.1'
 ```
@@ -176,13 +178,13 @@ Status Code = 202 Accepted
 ### Обновление комнаты
 
 ```http
-http://localhost:8080/api/v1/rooms/update/<uid>
+POST http://localhost:8080/api/v1/rooms/update/<uid>
 ```
 
 ### Запрос:
 
 ```curl
-curl --request PUT \
+curl --request POST \
   --url http://localhost:8080/api/v1/rooms/update/<uid> \
   --header 'Content-Type: application/json' \
   --header 'User-Agent: insomnia/10.1.1' \

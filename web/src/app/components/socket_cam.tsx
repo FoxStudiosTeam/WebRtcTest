@@ -40,7 +40,7 @@ export default function WebRTCChat() {
 
     const volumeStep = 0.1;
     const volumeMax = 2.0;
-    const volumeMin = 0.0;
+    const volumeMin = -1.0;
 
 
     const clientId = useRef(`client_${Math.random().toString(36).substr(2, 9)}`);
@@ -110,7 +110,7 @@ export default function WebRTCChat() {
     const handleStartCamera = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: true,
+                video: true,    
                 audio: true
             });
             localStreamRef.current = stream;
@@ -136,7 +136,9 @@ export default function WebRTCChat() {
 
         wsRef.current.onmessage = async (event) => {
             const message: WebRTCMessage = JSON.parse(event.data);
-            console.log('Received message:', message);
+            if (message.type != 'ice-candidate') {
+                console.log('Received message:', message);
+            }
             try {
                 switch (message.type) {
                     case 'user_joined':
@@ -282,7 +284,7 @@ export default function WebRTCChat() {
 
 
             <button
-                    className='bg-[#004899] w-[120px] h-[60px] rounded-[10px] text-2xl shadow-xl font-bold flex 
+                    className='bg-[#004899] w-[120px] h-[60px] rounded-[10px] text-2xl shadow-xl font-bold flex text-white
                     justify-center items-center gap-2 absolute top-[10px] right-[10px]'
                     disabled={!localStreamRef.current}
                     onClick={addVolume}
@@ -290,7 +292,7 @@ export default function WebRTCChat() {
                     ГРОМЧЕ
             </button>
             <button
-                    className='bg-[#DC362E] w-[120px] h-[60px] rounded-[10px] text-2xl shadow-xl font-bold flex 
+                    className='bg-[#DC362E] w-[120px] h-[60px] rounded-[10px] text-2xl shadow-xl font-bold flex text-white
                     justify-center items-center gap-2 absolute top-[10px] right-[140px]'
                     disabled={!localStreamRef.current}
                     onClick={decVolume}
@@ -316,7 +318,7 @@ export default function WebRTCChat() {
                 onClick={handleStartCamera}>Start Camera
                 </button>
                 <button
-                    className='bg-[#DC362E] w-[372px] h-[77px] rounded-[10px] text-2xl shadow-xl font-bold flex justify-center items-center gap-2'
+                    className='bg-[#DC362E] w-[372px] h-[77px] rounded-[10px] text-2xl shadow-xl font-bold flex justify-center items-center gap-2 text-white'
                     onClick={handleToggleVideo}
                     disabled={!localStreamRef.current}
                 >

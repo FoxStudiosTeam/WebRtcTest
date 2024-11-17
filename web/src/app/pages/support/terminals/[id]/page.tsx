@@ -4,8 +4,6 @@ import {useEffect, useRef, useState} from "react";
 import {useParams, useRouter} from "next/navigation";
 import { Header } from "@/app/components/header";
 import axios from "axios";
-import {MicOff} from "@/app/components/micOff";
-import {MicOn} from "@/app/components/micOn";
 import {Reset} from "@/app/components/reset mini";
 import {VolPlus} from "@/app/components/volPlus mini";
 import {VolMinus} from "@/app/components/volMinus mini";
@@ -162,17 +160,16 @@ export default function CallRoom() {
         if (!room) return;
 
         try {
-            const response = await axios.post(
-                `http://foxstudios.ru:30009/api/v1/rooms/update/${room.uuid}`,
-                {
+            const response = await fetch(`http://foxstudios.ru:30009/api/v1/rooms/update/${room.uuid}`, {
+                method: "POST",
+                body: JSON.stringify({
                     name: room.name,
                     physicalAddress: room.physicalAddress,
                     state: newState,
                     clientUid: room.clientUid,
                     operatorUid: room.operatorUid
-                }
-            );
-
+                }),
+            });
             if (response.status === 200) {
                 handleEndCall()
                 router.push("/pages/support/terminals/");

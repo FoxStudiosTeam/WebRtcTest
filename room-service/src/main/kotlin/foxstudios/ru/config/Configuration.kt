@@ -36,6 +36,7 @@ fun Application.configureHTTP() {
         //TODO -> security problems
         header("Access-Controle-Allow-Headers", "*")
     }
+    //`123
 //    install(CORS) {
 //        allowMethod(HttpMethod.Options)
 //        allowMethod(HttpMethod.Put)

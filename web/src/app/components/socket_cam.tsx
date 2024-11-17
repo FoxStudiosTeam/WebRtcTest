@@ -1,9 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image'
-import chatPic from '@/assets/chat.svg'
-import phonePic from '@/assets/Phone.svg'
-import micOff from '@/assets/Mic-off.svg'
-import micOn from '@/assets/Mic-on.svg'
 import { MicOff } from './micOff';
 import { MicOn } from './micOn';
 import { Reset } from './reset';

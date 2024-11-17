@@ -1,12 +1,17 @@
 "use client";
 
 import {useEffect, useRef, useState} from "react";
-import { useParams } from "next/navigation";
+import {useParams, useRouter} from "next/navigation";
 import { Header } from "@/app/components/header";
 import axios from "axios";
-import {MicOff} from "@/app/components/micOff";
-import {MicOn} from "@/app/components/micOn";
-import {Reset} from "@/app/components/reset";
+import {Reset} from "@/app/components/reset mini";
+import {VolPlus} from "@/app/components/volPlus mini";
+import {VolMinus} from "@/app/components/volMinus mini";
+import {CamOnMini} from "@/app/components/camOn mini";
+import {CamOffMini} from "@/app/components/camOff mini";
+import {MicOffMini} from "@/app/components/micOff mini";
+import {MicOnMini} from "@/app/components/micOn mini";
+import {Transfer} from "@/app/components/transfer";
 
 interface RoomDetails {
     uuid: string;
@@ -33,6 +38,7 @@ const configuration: RTCConfiguration = {
 
 export default function CallRoom() {
     const params = useParams();
+    const router = useRouter();
     const [room, setRoom] = useState<RoomDetails | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -53,7 +59,7 @@ export default function CallRoom() {
 
     const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
-    const volumeStep = 0.1;
+    const volumeStep = 0.25;
     const volumeMax = 2.0;
     const volumeMin = -1.0;
 
@@ -65,12 +71,11 @@ export default function CallRoom() {
             wsRef.current.send(JSON.stringify(message));
         }
     };
+    
 
-    useEffect(() => {
-        handleStartCamera();
-    }, []);
+    
 
-    const handleEndCall = () => {+
+    const handleEndCall = () => {
         sendMessage({
             type: 'disconnect',
             room: roomId
@@ -97,6 +102,8 @@ export default function CallRoom() {
 
         console.log("Call ended");
     };
+
+    
 
     const createPeerConnection = () => {
         if (peerConnectionRef.current) {
@@ -129,6 +136,15 @@ export default function CallRoom() {
                 }
                 remoteVideoRef.current.srcObject = event.streams[0];
             }
+            navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: true
+            }).then(stream => {
+                localStreamRef.current = stream;
+                if (localVideoRef.current) {
+                    localVideoRef.current.srcObject = stream;
+                }
+            });
         };
 
         // Handle ICE candidates
@@ -149,7 +165,37 @@ export default function CallRoom() {
 
         return peerConnection;
     };
+    const updateRoomStatus = async (newState: string) => {
+        if (!room) return;
 
+        try {
+            const response = await fetch(`http://foxstudios.ru:30009/api/v1/rooms/update/${room.uuid}`, {
+                method: "POST",
+                body: JSON.stringify({
+                    name: room.name,
+                    physicalAddress: room.physicalAddress,
+                    state: newState,
+                    clientUid: room.clientUid,
+                    operatorUid: room.operatorUid
+                }),
+            });
+            if (response.status === 200) {
+                handleEndCall()
+                router.push("/pages/support/terminals/");
+            } else {
+                console.error("Ошибка при обновлении комнаты:", response.body);
+            }
+        } catch (error) {
+            console.error("Ошибка при выполнении запроса:", error);
+        }
+    };
+    const handleReset = () => {
+        updateRoomStatus("CLOSED");
+    };
+
+    const handleTransfer = () => {
+        updateRoomStatus("TRANSFERING");
+    };
     const handleStartCamera = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
@@ -160,6 +206,21 @@ export default function CallRoom() {
             if (localVideoRef.current) {
                 localVideoRef.current.srcObject = stream;
             }
+            
+            // Set initial track states
+            stream.getVideoTracks().forEach(track => {
+                track.enabled = !isVideoMuted;
+            });
+            stream.getAudioTracks().forEach(track => {
+                track.enabled = !isAudioMuted;
+            });
+            
+            if (peerConnectionRef.current) {
+                localStreamRef.current?.getTracks().forEach(track => {
+                    peerConnectionRef.current?.addTrack(track, localStreamRef.current!);
+                });
+            }
+
             setIsJoinButtonDisabled(false);
         } catch (err) {
             console.error('Error accessing media devices:', err);
@@ -167,7 +228,7 @@ export default function CallRoom() {
     };
 
     const handleJoinRoom = () => {
-        wsRef.current = new WebSocket(`ws://37.110.11.176:9100/ws/operator/${clientId.current}`);
+        wsRef.current = new WebSocket(`ws://37.110.11.176:8080/ws/operator/${clientId.current}`);
 
         wsRef.current.onopen = () => {
             console.log('Connected to signaling server');
@@ -189,6 +250,7 @@ export default function CallRoom() {
                         if (remoteVideoRef.current) {
                             remoteVideoRef.current.srcObject = null;
                         }
+                        handleEndCall();
                         break;
                     case 'user_joined':
                         console.log("User joined, creating offer");
@@ -263,10 +325,17 @@ export default function CallRoom() {
 
     const handleToggleVideo = () => {
         if (localStreamRef.current) {
-            localStreamRef.current.getVideoTracks().forEach(track => {
+            const videoTracks = localStreamRef.current.getVideoTracks();
+            videoTracks.forEach(track => {
                 track.enabled = isVideoMuted;
             });
             setIsVideoMuted(!isVideoMuted);
+            
+            // Force video element update
+            if (localVideoRef.current) {
+                localVideoRef.current.srcObject = null;
+                localVideoRef.current.srcObject = localStreamRef.current;
+            }
         }
     };
 
@@ -292,33 +361,62 @@ export default function CallRoom() {
     };
 
 
-    useEffect(() => {
-        return () => {
-            localStreamRef.current?.getTracks().forEach(track => track.stop());
-            peerConnectionRef.current?.close();
-            wsRef.current?.close();
-        };
-    }, []);
-
+    
     useEffect(() => {
         const roomId = params?.id;
+        
+        // Cleanup function to properly stop all tracks and close connections
+        const cleanup = () => {
+            if (localStreamRef.current) {
+                localStreamRef.current.getTracks().forEach(track => track.stop());
+                localStreamRef.current = null;
+            }
+            if (peerConnectionRef.current) {
+                peerConnectionRef.current.close();
+                peerConnectionRef.current = null;
+            }
+            if (wsRef.current) {
+                wsRef.current.close();
+                wsRef.current = null;
+            }
+        };
 
-        if (!roomId) return;
+        // Create an async function inside useEffect
+        const initCamera = async () => {
+            // Clean up existing streams and connections first
+            cleanup();
+            
+            try {
+                await handleStartCamera();
+                console.log("Camera started");
+                if (!roomId) return;
 
-        axios
-            .get(`http://localhost:30009/api/v1/rooms/get/${roomId}`)
-            .then((response) => {
-                setRoom(response.data);
+                axios
+                    .get(`http://foxstudios.ru:30009/api/v1/rooms/get/${roomId}`)
+                    .then((response) => {
+                        setRoom(response.data);
+                        setLoading(false);
+                        if (!wsRef.current) {
+                            handleJoinRoom();
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching room details:", error);
+                        setError("Не удалось загрузить данные.");
+                        setLoading(false);
+                    });
+            } catch (error) {
+                console.error("Failed to initialize camera:", error);
+                setError("Не удалось инициализировать камеру.");
                 setLoading(false);
-                if (!wsRef.current) {
-                    handleJoinRoom();
-                }
-            })
-            .catch((error) => {
-                console.error("Error fetching room details:", error);
-                setError("Не удалось загрузить данные.");
-                setLoading(false);
-            });
+            }
+        };
+
+        // Call the async function
+        initCamera();
+
+        // Cleanup when component unmounts or roomId changes
+        return cleanup;
     }, [params?.id]);
 
     if (loading) {
@@ -334,70 +432,58 @@ export default function CallRoom() {
     }
 
     return (
-        <div>
+        <>
             <Header/>
-            <div className='absolute bg-green-500 w-full h-full'>
-                <div className="w-full h-full bg-white absolute">
+            <div className='absolute bg-white w-full h-full'>
+                <div className="w-full h-[100vh] bg-white absolute">
                     <video className='w-full h-[100vh] object-contain'
-                           ref={remoteVideoRef}
-                           autoPlay
-                           playsInline
+                        ref={remoteVideoRef}
+                        autoPlay
+                        playsInline
                     />
                 </div>
 
-                <div className="w-[200px] h-[200px] absolute top-[30px] left-[30px]">
-                    <video className='w-full h-full object-contain'
-                           ref={localVideoRef}
-                           autoPlay
-                           playsInline
-                           muted
+                <div className="w-[200px] h-fit absolute top-[30px] left-[30px]">
+                    <video className='rounded-[10px] w-full h-full object-contain'
+                        ref={localVideoRef}
+                        autoPlay
+                        playsInline
+                        muted
                     />
                 </div>
 
-
-                <button
-                    className='bg-[#004899] w-[120px] h-[60px] rounded-[10px] text-2xl shadow-xl font-bold flex text-white
-                    justify-center items-center gap-2 absolute top-[10px] right-[10px]'
-                    disabled={!localStreamRef.current}
-                    onClick={addVolume}
-                >
-                    ГРОМЧЕ
-                </button>
-                <button
-                    className='bg-[#DC362E] w-[120px] h-[60px] rounded-[10px] text-2xl shadow-xl font-bold flex text-white
-                    justify-center items-center gap-2 absolute top-[10px] right-[140px]'
-                    disabled={!localStreamRef.current}
-                    onClick={decVolume}
-                >
-                    ТИШЕ
-                </button>
+                <div className="absolute top-[10px] right-[10px]">
+                    <div className="flex flex-col gap-2">
+                        <VolPlus onclick={addVolume}/>
+                        <VolMinus onclick={decVolume}/>
+                    </div>
+                </div>
 
                 <div className="controls flex justify-center gap-10 bottom-[24px] w-full absolute z-10">
-                    <input
-                        className='absolute left-0 bg-green-500 text-red-500 text-center rounded'
-                        value={roomId}
-                        onChange={(e) => setRoomId(e.target.value)}
-                        placeholder="Enter room ID"
-                    />
-                    <button
-                        className='absolute left-0 top-[-2rem] bg-green-500 text-red-500 text-center rounded'
-                        onClick={handleJoinRoom}
-                        disabled={isJoinButtonDisabled}
-                    >Join Room
-                    </button>
-                    <button
-                        className='absolute left-0 top-[-4rem] bg-green-500 text-red-500 text-center rounded'
-                        onClick={handleStartCamera}>Start Camera
-                    </button>
-                    <button
-                        className='bg-[#DC362E] w-[372px] h-[77px] rounded-[10px] text-2xl shadow-xl font-bold flex justify-center items-center gap-2 text-white'
-                        onClick={handleToggleVideo}
-                        disabled={!localStreamRef.current}
-                    >
-                        {isVideoMuted ? 'Вас не видно' : 'Вас видно'}
-                    </button>
-                    {isAudioMuted ? <MicOff onclick={handleToggleAudio}/> : <MicOn onclick={handleToggleAudio}/>}
-                    <Reset onclick={handleEndCall}/>
+                    {/*<input*/}
+                    {/*    className='absolute left-0 bg-green-500 text-red-500 text-center rounded'*/}
+                    {/*    value={roomId}*/}
+                    {/*    onChange={(e) => setRoomId(e.target.value)}*/}
+                    {/*    placeholder="Enter room ID"*/}
+                    {/*/>*/}
+                    {/*<button*/}
+                    {/*    className='absolute left-0 top-[-2rem] bg-green-500 text-red-500 text-center rounded'*/}
+                    {/*    onClick={handleJoinRoom}*/}
+                    {/*    disabled={isJoinButtonDisabled}*/}
+                    {/*>Join Room*/}
+                    {/*</button>*/}
+                    {/*<button*/}
+                    {/*    className='absolute left-0 top-[-4rem] bg-green-500 text-red-500 text-center rounded'*/}
+                    {/*    onClick={handleStartCamera}>Start Camera*/}
+                    {/*</button>*/}
+                    <div className="bg-[#F0F4F8] flex space-x-5 p-3 px-5 rounded-[10px] shadow-2xl">
+                        {isVideoMuted ? <CamOnMini onclick={handleToggleVideo}/> :
+                            <CamOffMini onclick={handleToggleVideo}/>}
+                        {isAudioMuted ? <MicOffMini onclick={handleToggleAudio}/> :
+                            <MicOnMini onclick={handleToggleAudio}/>}
+                        <Reset onclick={handleReset}/>
+                        <Transfer onclick={handleTransfer}/>
+                    </div>
                     <input
                         type="range"
                         min={`${volumeMin}`}
@@ -405,7 +491,7 @@ export default function CallRoom() {
                         step={`${volumeStep}`}
                         value={volume}
                         onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-                        className="
+                        className=" hidden
                     w-[200px] rotate-[-90deg] absolute right-[-80px] bottom-[190px]
                     h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700
                     scale-[2]
@@ -413,6 +499,6 @@ export default function CallRoom() {
                     />
                 </div>
             </div>
-        </div>
+        </>
     );
 }

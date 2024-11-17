@@ -17,19 +17,23 @@ class WsService(var module : Application) {
         wsSession: WebSocketSession
     ) {
         try {
+            module.log.error("RoomInner: $rooms")
             when (message.type) {
                 MessageType.join -> {
                     if (message.room != null) {
                         if (!rooms.contains(message.room)) {
                             rooms[message.room!!] = ClientPair(null, null);
                         }
+                        module.log.error("Trace for $client $isOperator")
                         if (!rooms[message.room!!]!!.tryAdd(client, isOperator)) {
                             val localMessage = Message(MessageType.disconnect, null, message.room!!)
                             connections[client]?.send(objectMapper.writeValueAsString(localMessage))
-                            module.log.error("Already exists!")
+                            module.log.error("Room is full!")
                             module.log.error(rooms.toString())
                             return
                         }
+                        module.log.error("Process!")
+
                         for (otherClient in rooms[message.room!!]!!) {
                             if (otherClient != client) {
                                 val localMessage = Message(MessageType.user_joined, null, message.room!!)
@@ -40,6 +44,9 @@ class WsService(var module : Application) {
                     }
                 }
                 MessageType.disconnect -> {
+                    module.log.error("Try to send disconnect!")
+                    if (!rooms[message.room!!]!!.contains(client)) {return}
+                    module.log.error("Sending disconnect!")
                     for (otherClient in rooms[message.room!!]!!) {
                         if (otherClient != client) {
                             val localMessage = Message(MessageType.user_left, null, message.room!!)
@@ -49,6 +56,7 @@ class WsService(var module : Application) {
                     }
                 }
                 else -> {
+                    if (!rooms[message.room!!]!!.contains(client)) {return}
                     for (otherClient in rooms[message.room!!]!!) {
                         if (otherClient != client) {
                             val rawMessage = objectMapper.writeValueAsString(message)
@@ -72,6 +80,9 @@ class WsService(var module : Application) {
         connections.remove(client);
         for (room in rooms.keys) {
             if (rooms[room]!!.tryRemove(client, isOperator)) {
+                if (rooms[room]!! == ClientPair(null, null)) {
+                    rooms.remove(room)
+                }
                 return
             }
         }

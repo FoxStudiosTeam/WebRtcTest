@@ -26,6 +26,7 @@ data class ClientPair(
                 operator = value
                 return true
             }
+            return false
         }
         if (terminal == null) {
             terminal = value
@@ -36,12 +37,13 @@ data class ClientPair(
 
     fun tryRemove(value: String?, isOperator: Boolean): Boolean {
         if (isOperator) {
-            if (operator != null) {
+            if (operator != null && operator!! == value) {
                 operator = null
                 return true
             }
+            return false
         }
-        if (terminal != null) {
+        if (terminal != null && terminal!! == value) {
             terminal = null
             return true
         }

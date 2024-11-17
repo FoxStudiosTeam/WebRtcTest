@@ -22,7 +22,14 @@ export default function Terminals() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        axios.get("http://37.110.11.176:6000/api/v1/rooms/all").then((response) => {
+        axios
+            .get("http://kaiv.space:6000/api/v1/rooms/all", {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                withCredentials: true
+            }).then((response) => {
                 setRooms(response.data);
                 setLoading(false);
             }).catch((error: any) => {
@@ -39,12 +46,23 @@ export default function Terminals() {
     if (error) {
         return <p className="text-red-500">{error}</p>;
     }
+    const filteredRooms = rooms.filter((room) => room.state === "NEW");
 
+    if (filteredRooms.length === 0) {
+        return (
+            <div className="flex flex-col h-[100vh]">
+                <Header/>
+                <div className="flex justify-center items-center h-full bg-gray-100">
+                    <p className="text-center mt-10 text-black">Пока нет комнат.</p>
+                </div>
+            </div>
+        );
+    }
     return (
         <div>
             <Header />
             <div className="flex flex-row flex-wrap justify-center h-[94vh]">
-                {rooms.map((room) => (
+                {filteredRooms.map((room) => (
                     <Link
                         href={`/pages/support/terminals/${room.uuid}`}
                         key={room.uuid}

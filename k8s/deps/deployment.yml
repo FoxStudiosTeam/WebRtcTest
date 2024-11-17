@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: connector-server-pod
-          image: endienasg/web-rtc-ws-connector-service:master
+          image: endienasg/web-rtc-ws-connector-service:pr-10
           ports:
             - containerPort: 8080
 ---
@@ -94,7 +94,7 @@ spec:
     spec:
       containers:
         - name: signaling-server-pod
-          image: endienasg/web-rtc-room-service:master
+          image: endienasg/web-rtc-room-service:pr-10
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

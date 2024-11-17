@@ -22,7 +22,7 @@ export default function Terminals() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        axios.get("http://localhost:30009/api/v1/rooms/all").then((response) => {
+        axios.get("http://37.110.11.176:6000/api/v1/rooms/all").then((response) => {
                 setRooms(response.data);
                 setLoading(false);
             }).catch((error: any) => {

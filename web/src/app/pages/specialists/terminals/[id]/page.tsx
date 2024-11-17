@@ -173,7 +173,7 @@ export default function CallRoom1() {
     };
 
     const handleJoinRoom = () => {
-        wsRef.current = new WebSocket(`ws://37.110.11.176:9100/ws/operator/${clientId.current}`);
+        wsRef.current = new WebSocket(`ws://37.110.11.176:8080/ws/operator/${clientId.current}`);
 
         wsRef.current.onopen = () => {
             console.log('Connected to signaling server');
@@ -311,7 +311,7 @@ export default function CallRoom1() {
         if (!roomId) return;
 
         axios
-            .get(`http://localhost:30009/api/v1/rooms/get/${roomId}`)
+            .get(`http://foxstudios.ru:30009/api/v1/rooms/get/${roomId}`)
             .then((response) => {
                 setRoom(response.data);
                 setLoading(false);

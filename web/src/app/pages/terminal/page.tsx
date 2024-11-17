@@ -14,7 +14,7 @@ export default function FTerminal() {
     async function handleCreateRoom() {
         setLoading(true);
         try {
-            const response = await fetch("http://localhost:30009/api/v1/rooms/create", {
+            const response = await fetch("http://foxstudios.ru:30009/api/v1/rooms/create", {
                 method: "POST",
                 body: JSON.stringify({
                     name: "test",

@@ -23,7 +23,7 @@ export default function Terminals() {
 
     useEffect(() => {
         axios
-            .get("http://kaiv.space:6000/api/v1/rooms/all").then((response) => {
+            .get("http://foxstudios.ru:30009/api/v1/rooms/all").then((response) => {
                 setRooms(response.data);
                 setLoading(false);
             }).catch((error: any) => {

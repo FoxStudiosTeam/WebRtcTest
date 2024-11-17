@@ -23,7 +23,7 @@ export default function Terminals() {
 
     useEffect(() => {
         axios
-            .get("http://37.110.11.176:6000/api/v1/rooms/all")
+            .get("http://foxstudios.ru:30009/api/v1/rooms/all")
             .then((response) => {
                 setRooms(response.data);
                 setLoading(false);

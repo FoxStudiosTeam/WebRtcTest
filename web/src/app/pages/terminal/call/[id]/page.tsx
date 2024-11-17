@@ -304,7 +304,7 @@ export default function RoomTerminal() {
         if (!roomUid) return;
 
         axios
-            .get(`http://localhost:30009/api/v1/rooms/get/${roomUid}`)
+            .get(`http://foxstudios.ru:30009/api/v1/rooms/get/${roomUid}`)
             .then((response) => {
                 setRoom(response.data);
                 setLoading(false);

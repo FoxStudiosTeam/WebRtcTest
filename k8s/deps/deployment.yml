@@ -15,6 +15,7 @@ spec:
       containers:
         - name: connector-server-pod
           image: endienasg/web-rtc-ws-connector-service:pr-10
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
 ---

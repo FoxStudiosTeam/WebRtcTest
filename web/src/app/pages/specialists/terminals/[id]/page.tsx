@@ -1,7 +1,7 @@
 "use client";
 
 import {useEffect, useRef, useState} from "react";
-import { useParams } from "next/navigation"; // Новый способ работы с params
+import {useParams, useRouter} from "next/navigation"; // Новый способ работы с params
 import { Header } from "@/app/components/header";
 import axios from "axios";
 import {MicOffMini} from "@/app/components/micOff mini";
@@ -39,6 +39,7 @@ interface WebRTCMessage {
 
 export default function CallRoom1() {
     const params = useParams();
+    const router = useRouter();
     const [room, setRoom] = useState<RoomDetails | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -377,7 +378,37 @@ export default function CallRoom1() {
     if (!room) {
         return <p>Комната не найдена.</p>;
     }
+    const updateRoomStatus = async (newState: string) => {
+        if (!room) return;
 
+        try {
+            const response = await fetch(`http://foxstudios.ru:30009/api/v1/rooms/update/${room.uuid}`, {
+                method: "POST",
+                body: JSON.stringify({
+                    name: room.name,
+                    physicalAddress: room.physicalAddress,
+                    state: newState,
+                    clientUid: room.clientUid,
+                    operatorUid: room.operatorUid
+                }),
+            });
+            if (response.status === 200) {
+                handleEndCall()
+                router.push("/pages/specialists/terminals/");
+            } else {
+                console.error("Ошибка при обновлении комнаты:", response.data);
+            }
+        } catch (error) {
+            console.error("Ошибка при выполнении запроса:", error);
+        }
+    };
+    const handleReset = () => {
+        updateRoomStatus("CLOSED");
+    };
+
+    const handleTransfer = () => {
+        updateRoomStatus("TRANSFERING");
+    };
     return (
         <div className="flex flex-col h-[100vh]">
             <Header/>
@@ -426,8 +457,8 @@ export default function CallRoom1() {
                     <div className="bg-[#F0F4F8] flex space-x-5 p-3 px-5 rounded-[10px] shadow-2xl">
                         {isVideoMuted ? <CamOnMini onclick={handleToggleVideo}/>  : <CamOffMini onclick={handleToggleVideo}/>}
                         {isAudioMuted ? <MicOffMini onclick={handleToggleAudio}/> : <MicOnMini onclick={handleToggleAudio}/>}
-                        <Reset onclick={handleEndCall}/>
-                        <Transfer onclick={handleEndCall}/>
+                        <Reset onclick={handleReset}/>
+                        <Transfer onclick={handleTransfer}/>
                     </div>
                     <input
                         type="range"

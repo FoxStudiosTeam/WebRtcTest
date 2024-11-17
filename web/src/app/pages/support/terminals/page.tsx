@@ -1,6 +1,6 @@
 "use client";
 
-import { SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Header } from "@/app/components/header";
 import Image from "next/image";
 import stat from "@/assets/stat.svg";

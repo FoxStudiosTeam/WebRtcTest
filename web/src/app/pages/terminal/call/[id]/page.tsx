@@ -1,7 +1,7 @@
 "use client";
 
 import {useEffect, useRef, useState} from "react";
-import {useParams, useRouter} from "next/navigation";
+import {useParams} from "next/navigation";
 import axios from "axios";
 import { MicOff } from '@/app/components/micOff';
 import { MicOn } from '@/app/components/micOn';

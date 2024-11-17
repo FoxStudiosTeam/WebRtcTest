@@ -6,6 +6,7 @@ import Image from "next/image";
 import stat from "@/assets/stat.svg";
 import axios from "axios";
 import Link from "next/link";
+import {useRouter} from "next/navigation";
 
 interface Room {
     uuid: string;
@@ -17,6 +18,7 @@ interface Room {
 }
 
 export default function Terminals() {
+    const router = useRouter();
     const [rooms, setRooms] = useState<Room[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -47,6 +49,33 @@ export default function Terminals() {
         return () => clearInterval(interval);
     }, []);
 
+    const updateRoomStatus = async (newState: string, room) => {
+        if (!rooms) return;
+
+        try {
+            const response = await fetch(`http://foxstudios.ru:30009/api/v1/rooms/update/${room.uuid}`, {
+                method: "POST",
+                body: JSON.stringify({
+                    name: room.name,
+                    physicalAddress: room.physicalAddress,
+                    state: newState,
+                    clientUid: room.clientUid,
+                    operatorUid: room.operatorUid
+                }),
+            });
+            if (response.status === 200) {
+                router.push("/pages/terminal/");
+            } else {
+                console.error("Ошибка при обновлении комнаты:", response.data);
+            }
+        } catch (error) {
+            console.error("Ошибка при выполнении запроса:", error);
+        }
+    };
+    const handleLL = () => {
+        updateRoomStatus("FULL",rooms);
+    };
+
     if (loading) {
         return <div className="flex justify-center items-center"><p>Загрузка...</p></div>;
     }
@@ -72,6 +101,7 @@ export default function Terminals() {
             <div className="flex overflow-scroll flex-row flex-wrap justify-center h-full bg-gray-100">
                 {filteredRooms.map((room) => (
                     <Link
+                        onClick={handleLL}
                         href={`/pages/support/terminals/${room.uuid}`}
                         key={room.uuid}
                         className="rounded-[10px] w-[300px] m-5 h-[200px] shadow-xl transition duration-150 ease-in-out sm:hover:scale-105"

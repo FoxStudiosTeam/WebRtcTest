@@ -31,6 +31,7 @@ const configuration: RTCConfiguration = {
 
 export default function RoomTerminal() {
     const param = useParams();
+    const router = useRouter();
     const [room, setRoom] = useState<RoomDetails | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -315,6 +316,34 @@ export default function RoomTerminal() {
 
     }, [param?.id]);
 
+    const updateRoomStatus = async (newState: string) => {
+        if (!room) return;
+
+        try {
+            const response = await fetch(`http://foxstudios.ru:30009/api/v1/rooms/update/${room.uuid}`, {
+                method: "POST",
+                body: JSON.stringify({
+                    name: room.name,
+                    physicalAddress: room.physicalAddress,
+                    state: newState,
+                    clientUid: room.clientUid,
+                    operatorUid: room.operatorUid
+                }),
+            });
+            if (response.status === 200) {
+                handleEndCall()
+                router.push("/pages/terminal/");
+            } else {
+                console.error("Ошибка при обновлении комнаты:", response.data);
+            }
+        } catch (error) {
+            console.error("Ошибка при выполнении запроса:", error);
+        }
+    };
+    const handleReset = () => {
+        updateRoomStatus("CLOSED");
+    };
+    
     if (loading) {
         return <p>Загрузка...</p>;
     }
@@ -388,7 +417,7 @@ export default function RoomTerminal() {
                 {/*    {isVideoMuted ? 'Вас не видно' : 'Вас видно'}*/}
                 {/*</button>*/}
                 {isAudioMuted ? <MicOff onclick={handleToggleAudio}/> : <MicOn onclick={handleToggleAudio}/>}
-                <Reset onclick={handleEndCall}/>
+                <Reset onclick={handleReset}/>
                 <input
                     type="range"
                     min={`${volumeMin}`}

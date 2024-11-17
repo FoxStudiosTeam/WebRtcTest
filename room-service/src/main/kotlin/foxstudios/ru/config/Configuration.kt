@@ -43,11 +43,10 @@ fun Application.configureHTTP() {
         allowHeader(HttpHeaders.Authorization)
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.Accept)
-        allowHeader("MyCustomHeader")
-        allowCredentials = true
-        allowNonSimpleContentTypes = true
+
+        allowHeader(HttpHeaders.AccessControlAllowOrigin)
+        allowHeader(HttpHeaders.AccessControlAllowHeaders)
         allowHost("*")
-        allowHost("*", schemes = listOf("http", "https"))
         anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
     }
 }

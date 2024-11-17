@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation"; // Новый способ работы с params
-import { Header } from "@/app/components/header";
+import {useParams, useRouter} from "next/navigation";
 import axios from "axios";
 
 interface RoomDetails {
@@ -11,22 +10,22 @@ interface RoomDetails {
     physicalAddress: string;
     state: string;
     clientUid: string;
-    operatorUid: string;
+    operatorUid: string | null;
 }
 
-export default function CallRoom() {
-    const params = useParams();
+export default function RoomDetails() {
+    const param = useParams();
     const [room, setRoom] = useState<RoomDetails | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const roomId = params?.id;
+        const roomUid = param?.id;
 
-        if (!roomId) return;
+        if (!roomUid) return;
 
         axios
-            .get(`http://localhost:30009/api/v1/rooms/get/${roomId}`)
+            .get(`http://localhost:30009/api/v1/rooms/get/${roomUid}`)
             .then((response) => {
                 setRoom(response.data);
                 setLoading(false);
@@ -36,7 +35,7 @@ export default function CallRoom() {
                 setError("Не удалось загрузить данные.");
                 setLoading(false);
             });
-    }, [params?.id]);
+    }, [param?.id]);
 
     if (loading) {
         return <p>Загрузка...</p>;
@@ -52,10 +51,7 @@ export default function CallRoom() {
 
     return (
         <div>
-            <Header/>
-            <div>
 
-            </div>
         </div>
     );
 }

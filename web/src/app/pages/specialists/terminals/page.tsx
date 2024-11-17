@@ -23,7 +23,13 @@ export default function Terminals() {
 
     useEffect(() => {
         axios
-            .get("http://localhost:30009/api/v1/rooms/all")
+            .get("http://kaiv.space:6000/api/v1/rooms/all", {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                withCredentials: true
+            })
             .then((response) => {
                 setRooms(response.data);
                 setLoading(false);

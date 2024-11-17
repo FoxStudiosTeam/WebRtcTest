@@ -157,7 +157,7 @@ export default function WebRTCChat({isOperator}: WebRTCChatProps) {
     };
 
     const handleJoinRoom = () => {
-        wsRef.current = new WebSocket(`ws://37.110.11.176:9100/ws/${isOperator ? 'operator' : 'terminal'}/${clientId.current}`);
+        wsRef.current = new WebSocket(`ws://37.110.11.176:8080/ws/${isOperator ? 'operator' : 'terminal'}/${clientId.current}`);
         
         wsRef.current.onopen = () => {
             console.log('Connected to signaling server');

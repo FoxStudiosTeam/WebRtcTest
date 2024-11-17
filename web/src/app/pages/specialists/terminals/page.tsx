@@ -81,7 +81,7 @@ export default function Terminals() {
                         key={room.uuid}
                         className="rounded-[10px] w-[300px] m-5 h-[200px] shadow-xl transition duration-150 ease-in-out sm:hover:scale-105"
                     >
-                        <div className="text-gray-700 grid grid-rows-3 gap-1 h-full">
+                        <div className="text-gray-700 grid grid-rows-3 gap-1 h-full bg-white rounded-[10px]">
                             <h2 className="text-base font-bold truncate flex items-center justify-center">
                                 {room.name}
                             </h2>

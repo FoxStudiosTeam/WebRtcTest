@@ -77,7 +77,7 @@ export default function Terminals() {
                         className="rounded-[10px] w-[300px] m-5 h-[200px] shadow-xl transition duration-150 ease-in-out sm:hover:scale-105"
 
                     >
-                        <div className="grid grid-rows-3 gap-1 h-full">
+                        <div className="grid grid-rows-3 gap-1 h-full bg-white rounded-[10px]">
                             <h2 className="text-base text-gray-700 font-bold truncate flex items-center justify-center">
                                 {room.name}
                             </h2>

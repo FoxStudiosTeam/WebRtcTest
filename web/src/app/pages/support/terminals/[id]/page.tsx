@@ -162,7 +162,7 @@ export default function CallRoom() {
         if (!room) return;
 
         try {
-            const response = await axios.put(
+            const response = await axios.post(
                 `http://foxstudios.ru:30009/api/v1/rooms/update/${room.uuid}`,
                 {
                     name: room.name,
@@ -170,15 +170,14 @@ export default function CallRoom() {
                     state: newState,
                     clientUid: room.clientUid,
                     operatorUid: room.operatorUid
-
                 }
             );
 
             if (response.status === 200) {
-
+                handleEndCall()
                 router.push("/pages/support/terminals/");
             } else {
-                console.error("Ошибка при обновлении комнаты:", response);
+                console.error("Ошибка при обновлении комнаты:", response.data);
             }
         } catch (error) {
             console.error("Ошибка при выполнении запроса:", error);
@@ -186,12 +185,10 @@ export default function CallRoom() {
     };
     const handleReset = () => {
         updateRoomStatus("CLOSED");
-        handleEndCall()
     };
 
     const handleTransfer = () => {
         updateRoomStatus("TRANSFERING");
-        handleEndCall()
     };
     const handleStartCamera = async () => {
         try {

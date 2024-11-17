@@ -30,12 +30,12 @@ fun Route.roomRoutes(apiTitle: String, module: Application, mapper: ObjectMapper
         val result = roomService.createRoom(call.receive<String>())
         call.respond(result)
     }
-    delete("$apiTitle/rooms/delete/{id}") {
+    get("$apiTitle/rooms/delete/{id}") {
         val id = call.parameters["id"]!!
         val result = roomService.deleteRoom(id)
         call.respond(result)
     }
-    put("$apiTitle/rooms/update/{id}") {
+    post("$apiTitle/rooms/update/{id}") {
         val id = call.parameters["id"]!!
         val body = call.receive<String>()
         val result = roomService.updateRoom(id, body)

@@ -7,6 +7,13 @@ import axios from "axios";
 import {MicOff} from "@/app/components/micOff";
 import {MicOn} from "@/app/components/micOn";
 import {Reset} from "@/app/components/reset";
+import {VolPlus} from "@/app/components/volPlus mini";
+import {VolMinus} from "@/app/components/volMinus mini";
+import {CamOnMini} from "@/app/components/camOn mini";
+import {CamOffMini} from "@/app/components/camOff mini";
+import {MicOffMini} from "@/app/components/micOff mini";
+import {MicOnMini} from "@/app/components/micOn mini";
+import {Transfer} from "@/app/components/transfer";
 
 interface RoomDetails {
     uuid: string;
@@ -334,19 +341,19 @@ export default function CallRoom() {
     }
 
     return (
-        <div>
+        <div className="flex flex-col h-[100vh]">
             <Header/>
-            <div className='absolute bg-green-500 w-full h-full'>
-                <div className="w-full h-full bg-white absolute">
-                    <video className='w-full h-[100vh] object-contain'
+            <div className='absolute bg-white w-full h-full'>
+                <div className="w-full h-fit absolute">
+                    <video className='w-full h-[100vh] object-contain '
                            ref={remoteVideoRef}
                            autoPlay
                            playsInline
                     />
                 </div>
 
-                <div className="w-[200px] h-[200px] absolute top-[30px] left-[30px]">
-                    <video className='w-full h-full object-contain'
+                <div className="w-[200px] h-fit absolute top-[30px] left-[30px]">
+                    <video className='rounded-[10px] w-full h-full object-contain'
                            ref={localVideoRef}
                            autoPlay
                            playsInline
@@ -354,23 +361,12 @@ export default function CallRoom() {
                     />
                 </div>
 
-
-                <button
-                    className='bg-[#004899] w-[120px] h-[60px] rounded-[10px] text-2xl shadow-xl font-bold flex text-white
-                    justify-center items-center gap-2 absolute top-[10px] right-[10px]'
-                    disabled={!localStreamRef.current}
-                    onClick={addVolume}
-                >
-                    ГРОМЧЕ
-                </button>
-                <button
-                    className='bg-[#DC362E] w-[120px] h-[60px] rounded-[10px] text-2xl shadow-xl font-bold flex text-white
-                    justify-center items-center gap-2 absolute top-[10px] right-[140px]'
-                    disabled={!localStreamRef.current}
-                    onClick={decVolume}
-                >
-                    ТИШЕ
-                </button>
+                <div className="absolute top-[10px] right-[10px]">
+                    <div className="flex flex-col gap-2">
+                        <VolPlus onclick={addVolume}/>
+                        <VolMinus onclick={decVolume}/>
+                    </div>
+                </div>
 
                 <div className="controls flex justify-center gap-10 bottom-[24px] w-full absolute z-10">
                     <input
@@ -389,15 +385,14 @@ export default function CallRoom() {
                         className='absolute left-0 top-[-4rem] bg-green-500 text-red-500 text-center rounded'
                         onClick={handleStartCamera}>Start Camera
                     </button>
-                    <button
-                        className='bg-[#DC362E] w-[372px] h-[77px] rounded-[10px] text-2xl shadow-xl font-bold flex justify-center items-center gap-2 text-white'
-                        onClick={handleToggleVideo}
-                        disabled={!localStreamRef.current}
-                    >
-                        {isVideoMuted ? 'Вас не видно' : 'Вас видно'}
-                    </button>
-                    {isAudioMuted ? <MicOff onclick={handleToggleAudio}/> : <MicOn onclick={handleToggleAudio}/>}
-                    <Reset onclick={handleEndCall}/>
+                    <div className="bg-[#F0F4F8] flex space-x-5 p-3 px-5 rounded-[10px] shadow-2xl">
+                        {isVideoMuted ? <CamOnMini onclick={handleToggleVideo}/> :
+                            <CamOffMini onclick={handleToggleVideo}/>}
+                        {isAudioMuted ? <MicOffMini onclick={handleToggleAudio}/> :
+                            <MicOnMini onclick={handleToggleAudio}/>}
+                        <Reset onclick={handleEndCall}/>
+                        <Transfer onclick={handleEndCall}/>
+                    </div>
                     <input
                         type="range"
                         min={`${volumeMin}`}
@@ -405,7 +400,7 @@ export default function CallRoom() {
                         step={`${volumeStep}`}
                         value={volume}
                         onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-                        className="
+                        className=" hidden
                     w-[200px] rotate-[-90deg] absolute right-[-80px] bottom-[190px]
                     h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700
                     scale-[2]

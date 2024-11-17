@@ -37,7 +37,7 @@ interface WebRTCMessage {
     room?: string;
 }
 
-export default function CallRoom() {
+export default function CallRoom1() {
     const params = useParams();
     const [room, setRoom] = useState<RoomDetails | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
@@ -315,6 +315,9 @@ export default function CallRoom() {
             .then((response) => {
                 setRoom(response.data);
                 setLoading(false);
+                if (!wsRef.current) {
+                    handleJoinRoom();
+                }
             })
             .catch((error) => {
                 console.error("Error fetching room details:", error);

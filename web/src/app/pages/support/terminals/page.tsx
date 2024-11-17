@@ -69,7 +69,7 @@ export default function Terminals() {
     return (
         <div className="flex flex-col h-[100vh]">
             <Header />
-            <div className="flex flex-row flex-wrap justify-center h-full bg-gray-100">
+            <div className="flex overflow-scroll flex-row flex-wrap justify-center h-full bg-gray-100">
                 {filteredRooms.map((room) => (
                     <Link
                         href={`/pages/support/terminals/${room.uuid}`}

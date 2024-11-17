@@ -14,7 +14,7 @@ export default function FSpecialist(){
     return(
         <div className="flex flex-col h-[100vh]">
             <Header/>
-            <div className="flex justify-center items-center h-full bg-gray-100">
+            <div className="flex justify-center overflow-scroll items-center h-full bg-gray-100">
                 <div className="w-full max-w-sm p-6 bg-white rounded-lg shadow-md bg-[F0F4F8]">
                     <h1 className="text-2xl font-semibold text-center mb-6 text-black ">Авторизация</h1>
                     <form>

@@ -1,12 +1,12 @@
 "use client";
 
 import {useEffect, useRef, useState} from "react";
-import { useParams } from "next/navigation";
+import {useParams, useRouter} from "next/navigation";
 import { Header } from "@/app/components/header";
 import axios from "axios";
 import {MicOff} from "@/app/components/micOff";
 import {MicOn} from "@/app/components/micOn";
-import {Reset} from "@/app/components/reset";
+import {Reset} from "@/app/components/reset mini";
 import {VolPlus} from "@/app/components/volPlus mini";
 import {VolMinus} from "@/app/components/volMinus mini";
 import {CamOnMini} from "@/app/components/camOn mini";
@@ -40,6 +40,7 @@ const configuration: RTCConfiguration = {
 
 export default function CallRoom() {
     const params = useParams();
+    const router = useRouter();
     const [room, setRoom] = useState<RoomDetails | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -156,7 +157,41 @@ export default function CallRoom() {
 
         return peerConnection;
     };
+    const updateRoomStatus = async (newState: string) => {
+        if (!room) return;
 
+        try {
+            const response = await axios.put(
+                `http://foxstudios.ru:30009/api/v1/rooms/update/${room.uuid}`,
+                {
+                    name: room.name,
+                    physicalAddress: room.physicalAddress,
+                    state: newState,
+                    clientUid: room.clientUid,
+                    operatorUid: room.operatorUid
+
+                }
+            );
+
+            if (response.status === 200) {
+
+                router.push("/pages/support/terminals/");
+            } else {
+                console.error("Ошибка при обновлении комнаты:", response);
+            }
+        } catch (error) {
+            console.error("Ошибка при выполнении запроса:", error);
+        }
+    };
+    const handleReset = () => {
+        updateRoomStatus("CLOSED");
+        handleEndCall()
+    };
+
+    const handleTransfer = () => {
+        updateRoomStatus("TRANSFERING");
+        handleEndCall()
+    };
     const handleStartCamera = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
@@ -369,29 +404,29 @@ export default function CallRoom() {
                 </div>
 
                 <div className="controls flex justify-center gap-10 bottom-[24px] w-full absolute z-10">
-                    <input
-                        className='absolute left-0 bg-green-500 text-red-500 text-center rounded'
-                        value={roomId}
-                        onChange={(e) => setRoomId(e.target.value)}
-                        placeholder="Enter room ID"
-                    />
-                    <button
-                        className='absolute left-0 top-[-2rem] bg-green-500 text-red-500 text-center rounded'
-                        onClick={handleJoinRoom}
-                        disabled={isJoinButtonDisabled}
-                    >Join Room
-                    </button>
-                    <button
-                        className='absolute left-0 top-[-4rem] bg-green-500 text-red-500 text-center rounded'
-                        onClick={handleStartCamera}>Start Camera
-                    </button>
+                    {/*<input*/}
+                    {/*    className='absolute left-0 bg-green-500 text-red-500 text-center rounded'*/}
+                    {/*    value={roomId}*/}
+                    {/*    onChange={(e) => setRoomId(e.target.value)}*/}
+                    {/*    placeholder="Enter room ID"*/}
+                    {/*/>*/}
+                    {/*<button*/}
+                    {/*    className='absolute left-0 top-[-2rem] bg-green-500 text-red-500 text-center rounded'*/}
+                    {/*    onClick={handleJoinRoom}*/}
+                    {/*    disabled={isJoinButtonDisabled}*/}
+                    {/*>Join Room*/}
+                    {/*</button>*/}
+                    {/*<button*/}
+                    {/*    className='absolute left-0 top-[-4rem] bg-green-500 text-red-500 text-center rounded'*/}
+                    {/*    onClick={handleStartCamera}>Start Camera*/}
+                    {/*</button>*/}
                     <div className="bg-[#F0F4F8] flex space-x-5 p-3 px-5 rounded-[10px] shadow-2xl">
                         {isVideoMuted ? <CamOnMini onclick={handleToggleVideo}/> :
                             <CamOffMini onclick={handleToggleVideo}/>}
                         {isAudioMuted ? <MicOffMini onclick={handleToggleAudio}/> :
                             <MicOnMini onclick={handleToggleAudio}/>}
-                        <Reset onclick={handleEndCall}/>
-                        <Transfer onclick={handleEndCall}/>
+                        <Reset onclick={handleReset}/>
+                        <Transfer onclick={handleTransfer}/>
                     </div>
                     <input
                         type="range"

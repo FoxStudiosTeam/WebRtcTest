@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-
 export function Header(){
     return(
         <div className="flex items-center bg-[#343A40] h-[50px] w-full">

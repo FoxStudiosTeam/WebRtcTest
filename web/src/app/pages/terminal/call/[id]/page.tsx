@@ -341,8 +341,8 @@ export default function RoomTerminal() {
                 />
             </div>
 
-            <div className="w-[200px] h-[200px] absolute top-[30px] left-[30px] rounded-[40px]">
-                <video className='w-full h-full object-contain'
+            <div className="w-[200px] h-fit absolute top-[30px] left-[30px]">
+                <video className='rounded-[10px] w-full h-full object-contain'
                        ref={localVideoRef}
                        autoPlay
                        playsInline
@@ -368,22 +368,22 @@ export default function RoomTerminal() {
             </button>
 
             <div className="controls flex justify-center gap-10 bottom-[24px] w-full absolute z-10">
-                <input
-                    className='absolute left-0 bg-green-500 text-red-500 text-center rounded'
-                    value={roomId}
-                    onChange={(e) => setRoomId(e.target.value)}
-                    placeholder="Enter room ID"
-                />
-                <button
-                    className='absolute left-0 top-[-2rem] bg-green-500 text-red-500 text-center rounded'
-                    onClick={handleJoinRoom}
-                    disabled={isJoinButtonDisabled}
-                >Join Room
-                </button>
-                <button
-                    className='absolute left-0 top-[-4rem] bg-green-500 text-red-500 text-center rounded'
-                    onClick={handleStartCamera}>Start Camera
-                </button>
+                {/*<input*/}
+                {/*    className='absolute left-0 bg-green-500 text-red-500 text-center rounded'*/}
+                {/*    value={roomId}*/}
+                {/*    onChange={(e) => setRoomId(e.target.value)}*/}
+                {/*    placeholder="Enter room ID"*/}
+                {/*/>*/}
+                {/*<button*/}
+                {/*    className='absolute left-0 top-[-2rem] bg-green-500 text-red-500 text-center rounded'*/}
+                {/*    onClick={handleJoinRoom}*/}
+                {/*    disabled={isJoinButtonDisabled}*/}
+                {/*>Join Room*/}
+                {/*</button>*/}
+                {/*<button*/}
+                {/*    className='absolute left-0 top-[-4rem] bg-green-500 text-red-500 text-center rounded'*/}
+                {/*    onClick={handleStartCamera}>Start Camera*/}
+                {/*</button>*/}
                 {/*<button*/}
                 {/*    className='bg-[#DC362E] w-[372px] h-[77px] rounded-[10px] text-2xl shadow-xl font-bold flex justify-center items-center gap-2 text-white'*/}
                 {/*    onClick={handleToggleVideo}*/}

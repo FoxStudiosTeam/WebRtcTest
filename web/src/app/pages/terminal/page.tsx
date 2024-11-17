@@ -41,7 +41,7 @@ export default function FTerminal() {
     }
 
     return (
-        <div className="bg-[#F0F4F8] flex flex-col justify-center h-[100vh] gap-10">
+        <div className="bg-gray-100 flex flex-col justify-center h-[100vh] gap-10">
             <p className="font-bold text-[50px] text-black w-full text-center">
                 Служба поддержки
             </p>

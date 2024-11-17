@@ -72,10 +72,6 @@ export default function CallRoom1() {
         }
     };
 
-    useEffect(() => {
-        handleStartCamera();
-    }, []);
-
     const handleEndCall = () => {+
         sendMessage({
             type: 'disconnect',
@@ -166,6 +162,12 @@ export default function CallRoom1() {
             if (localVideoRef.current) {
                 localVideoRef.current.srcObject = stream;
             }
+            if (peerConnectionRef.current) {
+                localStreamRef.current?.getTracks().forEach(track => {
+                    peerConnectionRef.current?.addTrack(track, localStreamRef.current!);
+                });
+            }
+
             setIsJoinButtonDisabled(false);
         } catch (err) {
             console.error('Error accessing media devices:', err);
@@ -297,13 +299,13 @@ export default function CallRoom1() {
         }
     };
 
-    useEffect(() => {
-        return () => {
-            localStreamRef.current?.getTracks().forEach(track => track.stop());
-            peerConnectionRef.current?.close();
-            wsRef.current?.close();
-        };
-    }, []);
+    //useEffect(() => {
+    //    return () => {
+    //        localStreamRef.current?.getTracks().forEach(track => track.stop());
+    //        peerConnectionRef.current?.close();
+    //        wsRef.current?.close();
+    //    };
+    //}, []);
 
     useEffect(() => {
         const roomId = params?.id;
@@ -367,22 +369,22 @@ export default function CallRoom1() {
                 </div>
 
                 <div className="controls flex justify-center gap-10 bottom-[24px] w-full absolute z-10">
-                    <input
-                        className='absolute left-0 bg-green-500 text-red-500 text-center rounded'
-                        value={roomId}
-                        onChange={(e) => setRoomId(e.target.value)}
-                        placeholder="Enter room ID"
-                    />
-                    <button
-                        className='absolute left-0 top-[-2rem] bg-green-500 text-red-500 text-center rounded'
-                        onClick={handleJoinRoom}
-                        disabled={isJoinButtonDisabled}
-                    >Join Room
-                    </button>
-                    <button
-                        className='absolute left-0 top-[-4rem] bg-green-500 text-red-500 text-center rounded'
-                        onClick={handleStartCamera}>Start Camera
-                    </button>
+                    {/*<input*/}
+                    {/*    className='absolute left-0 bg-green-500 text-red-500 text-center rounded'*/}
+                    {/*    value={roomId}*/}
+                    {/*    onChange={(e) => setRoomId(e.target.value)}*/}
+                    {/*    placeholder="Enter room ID"*/}
+                    {/*/>*/}
+                    {/*<button*/}
+                    {/*    className='absolute left-0 top-[-2rem] bg-green-500 text-red-500 text-center rounded'*/}
+                    {/*    onClick={handleJoinRoom}*/}
+                    {/*    disabled={isJoinButtonDisabled}*/}
+                    {/*>Join Room*/}
+                    {/*</button>*/}
+                    {/*<button*/}
+                    {/*    className='absolute left-0 top-[-4rem] bg-green-500 text-red-500 text-center rounded'*/}
+                    {/*    onClick={handleStartCamera}>Start Camera*/}
+                    {/*</button>*/}
                     <div className="bg-[#F0F4F8] flex space-x-5 p-3 px-5 rounded-[10px] shadow-2xl">
                         {isVideoMuted ? <CamOnMini onclick={handleToggleVideo}/>  : <CamOffMini onclick={handleToggleVideo}/>}
                         {isAudioMuted ? <MicOffMini onclick={handleToggleAudio}/> : <MicOnMini onclick={handleToggleAudio}/>}

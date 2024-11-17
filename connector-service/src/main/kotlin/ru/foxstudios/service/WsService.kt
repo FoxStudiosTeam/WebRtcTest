@@ -9,7 +9,7 @@ class WsService {
     suspend fun resolveMove(
         message: Message,
         connections: HashMap<String, WebSocketSession>,
-        rooms: HashMap<String, ArrayList<String>>,
+        rooms: HashMap<String, HashSet<String>>,
         client: String,
         wsSession: WebSocketSession
     ) {
@@ -18,9 +18,9 @@ class WsService {
                 MessageType.join -> {
                     if (message.room != null) {
                         if (!rooms.contains(message.room)) {
-                            rooms[message.room!!] = ArrayList<String>()
-                            rooms[message.room!!]!!.add(client)
+                            rooms[message.room!!] = HashSet<String>()
                         }
+                        rooms[message.room!!]!!.add(client)
 
                         for (otherClient in rooms[message.room!!]!!) {
                             if (otherClient != client) {

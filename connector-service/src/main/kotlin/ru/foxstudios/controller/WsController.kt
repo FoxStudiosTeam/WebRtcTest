@@ -10,7 +10,7 @@ import ru.foxstudios.service.WsService
 var objectMapper = jacksonObjectMapper()
 val webSocketService = WsService()
 val connections = HashMap<String,WebSocketSession>()
-val rooms = HashMap<String, ArrayList<String>>()
+val rooms = HashMap<String, HashSet<String>>()
 
 fun Route.wsController() {
     webSocket("/ws/{client_id}") {

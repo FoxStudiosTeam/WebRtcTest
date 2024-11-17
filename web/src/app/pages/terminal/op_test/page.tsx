@@ -3,8 +3,8 @@
 import WebRTCChat from "@/app/components/socket_cam";
 
 
-export default function TerminalCall(){
+export default function TerminalCallTest(){
     return(
-        <WebRTCChat isOperator={false}/>
+        <WebRTCChat isOperator={true}/>
     );
 }

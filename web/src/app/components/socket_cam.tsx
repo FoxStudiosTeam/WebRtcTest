@@ -8,7 +8,7 @@ import { MicOff } from './micOff';
 import { MicOn } from './micOn';
 import { Reset } from './reset';
 interface WebRTCMessage {
-    type: 'join' | 'offer' | 'answer' | 'ice-candidate' | 'user_joined';
+    type: 'join' | 'offer' | 'answer' | 'ice-candidate' | 'user_joined' | 'disconnect' | 'user_left';
     data?: RTCSessionDescriptionInit | RTCIceCandidateInit;
     room?: string;
 }
@@ -21,7 +21,11 @@ const configuration: RTCConfiguration = {
     ]
 };
 
-export default function WebRTCChat() {
+interface WebRTCChatProps {
+    isOperator: boolean;
+}
+
+export default function WebRTCChat({isOperator}: WebRTCChatProps) {
     const [isJoinButtonDisabled, setIsJoinButtonDisabled] = useState(true);
     const [roomId, setRoomId] = useState('test-room');
     const [isAudioMuted, setIsAudioMuted] = useState(false);
@@ -56,6 +60,10 @@ export default function WebRTCChat() {
     }, []);
 
     const handleEndCall = () => {
+        sendMessage({
+            type: 'disconnect',
+            room: roomId
+        });
         // Закрываем WebSocket
         wsRef.current?.close();
         wsRef.current = null;
@@ -65,13 +73,14 @@ export default function WebRTCChat() {
         peerConnectionRef.current = null;
     
         // Останавливаем все треки локального потока
-        localStreamRef.current?.getTracks().forEach(track => track.stop());
-        localStreamRef.current = null;
+        //localStreamRef.current?.getTracks().forEach(track => track.stop());
+        //localStreamRef.current = null;
     
         // Очищаем видеоэлементы
-        if (localVideoRef.current) {
-            localVideoRef.current.srcObject = null;
-        }
+        //if (localVideoRef.current) {
+        //    localVideoRef.current.srcObject = null;
+        //}
+        
         if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = null;
         }
@@ -148,7 +157,7 @@ export default function WebRTCChat() {
     };
 
     const handleJoinRoom = () => {
-        wsRef.current = new WebSocket(`ws://37.110.11.176:9100/ws/${clientId.current}`);
+        wsRef.current = new WebSocket(`ws://37.110.11.176:9100/ws/${isOperator ? 'operator' : 'terminal'}/${clientId.current}`);
         
         wsRef.current.onopen = () => {
             console.log('Connected to signaling server');
@@ -165,6 +174,12 @@ export default function WebRTCChat() {
             }
             try {
                 switch (message.type) {
+                    case 'user_left':
+                        console.log("User left, closing peer connection");
+                        if (remoteVideoRef.current) {
+                            remoteVideoRef.current.srcObject = null;
+                        }
+                        break;
                     case 'user_joined':
                         console.log("User joined, creating offer");
                         const pc1 = createPeerConnection();
@@ -207,6 +222,10 @@ export default function WebRTCChat() {
                                 console.error("Error adding received ice candidate", e);
                             }
                         }
+                        break;
+                    case 'disconnect':
+                        console.log("Received disconnect message");
+                        handleEndCall();
                         break;
                 }
             } catch (e) {

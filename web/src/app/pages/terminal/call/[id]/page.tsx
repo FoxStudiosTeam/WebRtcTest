@@ -51,7 +51,7 @@ export default function RoomTerminal() {
 
     const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
-    const volumeStep = 0.1;
+    const volumeStep = 0.25;
     const volumeMax = 2.0;
     const volumeMin = -1.0;
 
@@ -328,10 +328,11 @@ export default function RoomTerminal() {
     }
 
     return (
-        <div className='absolute bg-green-500 w-full h-full'>
+        <div className="flex flex-col h-[100vh]">
+        <div className='absolute bg-white w-full h-full'>
             <div className="w-full h-full bg-white absolute">
                 <video className='w-full h-fit object-contain'
-                       ref={remoteVideoRef}
+                       ref={ remoteVideoRef}
                        autoPlay
                        playsInline
                 />
@@ -403,6 +404,7 @@ export default function RoomTerminal() {
                     "
                 />
             </div>
+        </div>
         </div>
     );
 }

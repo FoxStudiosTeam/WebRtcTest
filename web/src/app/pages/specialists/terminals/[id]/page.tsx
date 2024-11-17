@@ -59,7 +59,7 @@ export default function CallRoom1() {
 
     const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
-    const volumeStep = 0.1;
+    const volumeStep = 0.25;
     const volumeMax = 2.0;
     const volumeMin = -1.0;
 
@@ -131,6 +131,15 @@ export default function CallRoom1() {
                 }
                 remoteVideoRef.current.srcObject = event.streams[0];
             }
+            navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: true
+            }).then(stream => {
+                localStreamRef.current = stream;
+                if (localVideoRef.current) {
+                    localVideoRef.current.srcObject = stream;
+                }
+            });
         };
 
         // Handle ICE candidates

@@ -166,6 +166,12 @@ export default function CallRoom1() {
             if (localVideoRef.current) {
                 localVideoRef.current.srcObject = stream;
             }
+            if (peerConnectionRef.current) {
+                localStreamRef.current?.getTracks().forEach(track => {
+                    peerConnectionRef.current?.addTrack(track, localStreamRef.current!);
+                });
+            }
+
             setIsJoinButtonDisabled(false);
         } catch (err) {
             console.error('Error accessing media devices:', err);

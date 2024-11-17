@@ -72,6 +72,7 @@ export default function CallRoom() {
             wsRef.current.send(JSON.stringify(message));
         }
     };
+    
 
     useEffect(() => {
         handleStartCamera();
@@ -104,6 +105,8 @@ export default function CallRoom() {
 
         console.log("Call ended");
     };
+
+    
 
     const createPeerConnection = () => {
         if (peerConnectionRef.current) {
@@ -167,6 +170,13 @@ export default function CallRoom() {
             if (localVideoRef.current) {
                 localVideoRef.current.srcObject = stream;
             }
+            
+            if (peerConnectionRef.current) {
+                localStreamRef.current?.getTracks().forEach(track => {
+                    peerConnectionRef.current?.addTrack(track, localStreamRef.current!);
+                });
+            }
+
             setIsJoinButtonDisabled(false);
         } catch (err) {
             console.error('Error accessing media devices:', err);

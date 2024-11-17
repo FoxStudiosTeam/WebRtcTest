@@ -1,6 +1,6 @@
 # SevenSupport ![GitHub top language](https://img.shields.io/github/languages/top/FoxStudiosTeam/WebRtcTest) ![Коммиты](https://img.shields.io/github/commit-activity/t/FoxStudiosTeam/WebRtcTest?color=green) ![Пулл реквесты](https://img.shields.io/github/issues-pr-closed/FoxStudiosTeam/WebRtcTest?color=green)
 
-Документация к сервсису разработанному на всеросийском хакатоне связи 
+Сервис связи клиентов и операторов разработанный для компании sevencom на Всероссийском хакатоне связи
 
 ## Структура проекта 
 

@@ -32,6 +32,7 @@ fun Application.configureHTTP() {
     install(DefaultHeaders) {
         header("X-Engine", "Ktor") // will send this header with each response
         header("Access-Control-Allow-Origin","*")
+        header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
     }
     install(CORS) {
         allowMethod(HttpMethod.Options)

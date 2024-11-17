@@ -31,6 +31,7 @@ fun Application.configureSerialization() {
 fun Application.configureHTTP() {
     install(DefaultHeaders) {
         header("X-Engine", "Ktor") // will send this header with each response
+        header("Access-Control-Allow-Origin","*")
     }
     install(CORS) {
         allowMethod(HttpMethod.Options)
@@ -44,9 +45,6 @@ fun Application.configureHTTP() {
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.Accept)
 
-        allowHeader(HttpHeaders.AccessControlAllowOrigin)
-        allowHeader(HttpHeaders.AccessControlAllowHeaders)
-        allowHost("*")
         anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
     }
 }

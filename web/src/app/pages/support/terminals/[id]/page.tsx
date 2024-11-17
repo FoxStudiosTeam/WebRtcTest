@@ -59,7 +59,7 @@ export default function CallRoom() {
 
     const clamp = (num: number, min: number, max: number) => Math.min(Math.max(num, min), max);
 
-    const volumeStep = 0.1;
+    const volumeStep = 0.25;
     const volumeMax = 2.0;
     const volumeMin = -1.0;
 
@@ -136,6 +136,15 @@ export default function CallRoom() {
                 }
                 remoteVideoRef.current.srcObject = event.streams[0];
             }
+            navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: true
+            }).then(stream => {
+                localStreamRef.current = stream;
+                if (localVideoRef.current) {
+                    localVideoRef.current.srcObject = stream;
+                }
+            });
         };
 
         // Handle ICE candidates
@@ -355,33 +364,59 @@ export default function CallRoom() {
     
     useEffect(() => {
         const roomId = params?.id;
-        localStreamRef.current?.getTracks().forEach(track => track.stop());
-        peerConnectionRef.current?.close();
-        wsRef.current?.close();
+        
+        // Cleanup function to properly stop all tracks and close connections
+        const cleanup = () => {
+            if (localStreamRef.current) {
+                localStreamRef.current.getTracks().forEach(track => track.stop());
+                localStreamRef.current = null;
+            }
+            if (peerConnectionRef.current) {
+                peerConnectionRef.current.close();
+                peerConnectionRef.current = null;
+            }
+            if (wsRef.current) {
+                wsRef.current.close();
+                wsRef.current = null;
+            }
+        };
+
         // Create an async function inside useEffect
         const initCamera = async () => {
-            await handleStartCamera();
-            console.log("Camera started");
-            if (!roomId) return;
+            // Clean up existing streams and connections first
+            cleanup();
+            
+            try {
+                await handleStartCamera();
+                console.log("Camera started");
+                if (!roomId) return;
 
-            axios
-                .get(`http://foxstudios.ru:30009/api/v1/rooms/get/${roomId}`)
-                .then((response) => {
-                    setRoom(response.data);
-                    setLoading(false);
-                    if (!wsRef.current) {
-                        handleJoinRoom();
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error fetching room details:", error);
-                    setError("Не удалось загрузить данные.");
-                    setLoading(false);
-                });
+                axios
+                    .get(`http://foxstudios.ru:30009/api/v1/rooms/get/${roomId}`)
+                    .then((response) => {
+                        setRoom(response.data);
+                        setLoading(false);
+                        if (!wsRef.current) {
+                            handleJoinRoom();
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching room details:", error);
+                        setError("Не удалось загрузить данные.");
+                        setLoading(false);
+                    });
+            } catch (error) {
+                console.error("Failed to initialize camera:", error);
+                setError("Не удалось инициализировать камеру.");
+                setLoading(false);
+            }
         };
 
         // Call the async function
         initCamera();
+
+        // Cleanup when component unmounts or roomId changes
+        return cleanup;
     }, [params?.id]);
 
     if (loading) {
@@ -400,20 +435,20 @@ export default function CallRoom() {
         <div className="flex flex-col h-[100vh]">
             <Header/>
             <div className='absolute bg-white w-full h-full'>
-                <div className="w-full h-fit absolute">
-                    <video className='w-full h-[100vh] object-contain '
-                           ref={remoteVideoRef}
-                           autoPlay
-                           playsInline
+                <div className="w-full h-full bg-white absolute">
+                    <video className='w-full h-fit object-contain'
+                        ref={remoteVideoRef}
+                        autoPlay
+                        playsInline
                     />
                 </div>
 
                 <div className="w-[200px] h-fit absolute top-[30px] left-[30px]">
                     <video className='rounded-[10px] w-full h-full object-contain'
-                           ref={localVideoRef}
-                           autoPlay
-                           playsInline
-                           muted
+                        ref={localVideoRef}
+                        autoPlay
+                        playsInline
+                        muted
                     />
                 </div>
 

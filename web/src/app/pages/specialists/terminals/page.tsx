@@ -23,13 +23,7 @@ export default function Terminals() {
 
     useEffect(() => {
         axios
-            .get("http://kaiv.space:6000/api/v1/rooms/all", {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
-                withCredentials: true
-            })
+            .get("http://37.110.11.176:6000/api/v1/rooms/all")
             .then((response) => {
                 setRooms(response.data);
                 setLoading(false);
@@ -56,13 +50,20 @@ export default function Terminals() {
     const filteredRooms = rooms.filter((room) => room.state === "TRANSFERING");
 
     if (filteredRooms.length === 0) {
-        return <p className="text-center mt-10">Нет комнат со статусом TRANSFERING.</p>;
+        return (
+            <div className="flex flex-col h-[100vh]">
+                <Header/>
+                <div className="flex justify-center items-center h-full bg-gray-100">
+                    <p className="text-center mt-10 text-black">Нет комнат со статусом TRANSFERING.</p>
+                </div>
+            </div>
+        );
     }
 
     return (
-        <div>
-            <Header />
-            <div className="flex flex-row flex-wrap justify-center h-[94vh]">
+        <div className="flex flex-col h-[100vh]">
+            <Header/>
+            <div className="flex flex-row flex-wrap justify-center h-full bg-white">
                 {filteredRooms.map((room) => (
                     <Link
                         href={`/pages/specialists/terminals/${room.uuid}`}

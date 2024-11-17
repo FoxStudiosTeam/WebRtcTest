@@ -16,7 +16,7 @@ interface RoomDetails {
 }
 
 interface WebRTCMessage {
-    type: 'join' | 'offer' | 'answer' | 'ice-candidate' | 'user_joined';
+    type: 'join' | 'offer' | 'answer' | 'ice-candidate' | 'user_joined' | 'disconnect' | 'user_left';
     data?: RTCSessionDescriptionInit | RTCIceCandidateInit;
     room?: string;
 }
@@ -36,7 +36,7 @@ export default function RoomTerminal() {
     const [error, setError] = useState<string | null>(null);
 
     const [isJoinButtonDisabled, setIsJoinButtonDisabled] = useState(true);
-    const [roomId, setRoomId] = useState(param.id);
+    const [roomId, setRoomId] = useState(param.id as string);
     const [isAudioMuted, setIsAudioMuted] = useState(false);
     const [isVideoMuted, setIsVideoMuted] = useState(false);
     const [volume, setVolume] = useState(1);
@@ -68,7 +68,11 @@ export default function RoomTerminal() {
         handleStartCamera();
     }, []);
 
-    const handleEndCall = () => {
+    const handleEndCall = () => {+
+        sendMessage({
+            type: 'disconnect',
+            room: roomId
+        });
         // Закрываем WebSocket
         wsRef.current?.close();
         wsRef.current = null;
@@ -132,7 +136,7 @@ export default function RoomTerminal() {
                 sendMessage({
                     type: 'ice-candidate',
                     data: event.candidate,
-                    room: roomId
+                    room: roomId 
                 });
             }
         };
@@ -161,7 +165,7 @@ export default function RoomTerminal() {
     };
 
     const handleJoinRoom = () => {
-        wsRef.current = new WebSocket(`ws://37.110.11.176:9100/ws/${clientId.current}`);
+        wsRef.current = new WebSocket(`ws://37.110.11.176:9100/ws/terminal/${clientId.current}`);
 
         wsRef.current.onopen = () => {
             console.log('Connected to signaling server');
@@ -178,6 +182,12 @@ export default function RoomTerminal() {
             }
             try {
                 switch (message.type) {
+                    case 'user_left':
+                        console.log("User left, closing peer connection");
+                        if (remoteVideoRef.current) {
+                            remoteVideoRef.current.srcObject = null;
+                        }
+                        break;
                     case 'user_joined':
                         console.log("User joined, creating offer");
                         const pc1 = createPeerConnection();
@@ -220,6 +230,10 @@ export default function RoomTerminal() {
                                 console.error("Error adding received ice candidate", e);
                             }
                         }
+                        break;
+                    case 'disconnect':
+                        console.log("Received disconnect message");
+                        handleEndCall();
                         break;
                 }
             } catch (e) {

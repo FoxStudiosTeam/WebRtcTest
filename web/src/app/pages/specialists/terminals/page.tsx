@@ -29,7 +29,7 @@ export default function Terminals() {
                 setRooms(response.data);
                 setLoading(false);
             })
-            .catch((error: any) => {
+            .catch((error) => {
                 console.error("Error fetching rooms:", error);
                 setError("Не удалось загрузить данные.");
                 setLoading(false);

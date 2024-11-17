@@ -49,7 +49,7 @@ export default function Terminals() {
         return () => clearInterval(interval);
     }, []);
 
-    const updateRoomStatus = async (newState: string, room) => {
+    const updateRoomStatus = async (newState: string, room: Room) => {
         if (!rooms) return;
 
         try {
@@ -66,14 +66,14 @@ export default function Terminals() {
             if (response.status === 200) {
 
             } else {
-                console.error("Ошибка при обновлении комнаты:", response.data);
+                console.error("Ошибка при обновлении комнаты:", response.body);
             }
         } catch (error) {
             console.error("Ошибка при выполнении запроса:", error);
         }
     };
     const handleLL = () => {
-        updateRoomStatus("FULL",rooms);
+        updateRoomStatus("FULL", rooms[0]);
     };
 
     if (loading) {

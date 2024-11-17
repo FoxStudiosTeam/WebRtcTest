@@ -183,7 +183,7 @@ export default function CallRoom() {
                 handleEndCall()
                 router.push("/pages/support/terminals/");
             } else {
-                console.error("Ошибка при обновлении комнаты:", response.data);
+                console.error("Ошибка при обновлении комнаты:", response.body);
             }
         } catch (error) {
             console.error("Ошибка при выполнении запроса:", error);
@@ -432,11 +432,11 @@ export default function CallRoom() {
     }
 
     return (
-        <div className="flex flex-col h-[100vh]">
+        <>
             <Header/>
             <div className='absolute bg-white w-full h-full'>
-                <div className="w-full h-full bg-white absolute">
-                    <video className='w-full h-fit object-contain'
+                <div className="w-full h-[100vh] bg-white absolute">
+                    <video className='w-full h-[100vh] object-contain'
                         ref={remoteVideoRef}
                         autoPlay
                         playsInline
@@ -499,6 +499,6 @@ export default function CallRoom() {
                     />
                 </div>
             </div>
-        </div>
+        </>
     );
 }

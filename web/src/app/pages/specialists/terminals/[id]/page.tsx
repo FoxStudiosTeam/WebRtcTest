@@ -12,7 +12,6 @@ import {Reset} from "@/app/components/reset mini";
 import {Transfer} from "@/app/components/transfer"
 import {VolPlus} from "@/app/components/volPlus mini";
 import {VolMinus} from "@/app/components/volMinus mini";
-import Image from "next/image";
 
 interface RoomDetails {
     uuid: string;
@@ -44,8 +43,7 @@ export default function CallRoom1() {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    const [isJoinButtonDisabled, setIsJoinButtonDisabled] = useState(true);
-    const [roomId, setRoomId] = useState(params.id as string);
+    const [roomId, _setRoomId] = useState(params.id as string);
     const [isAudioMuted, setIsAudioMuted] = useState(false);
     const [isVideoMuted, setIsVideoMuted] = useState(false);
     const [volume, setVolume] = useState(1);
@@ -188,7 +186,6 @@ export default function CallRoom1() {
                 });
             }
 
-            setIsJoinButtonDisabled(false);
         } catch (err) {
             console.error('Error accessing media devices:', err);
         }
@@ -396,7 +393,7 @@ export default function CallRoom1() {
                 handleEndCall()
                 router.push("/pages/specialists/terminals/");
             } else {
-                console.error("Ошибка при обновлении комнаты:", response.data);
+                console.error("Ошибка при обновлении комнаты:", response.body);
             }
         } catch (error) {
             console.error("Ошибка при выполнении запроса:", error);
@@ -413,8 +410,8 @@ export default function CallRoom1() {
         <div className="flex flex-col h-[100vh]">
             <Header/>
             <div className='absolute bg-white w-full h-full'>
-                <div className="w-full h-fit absolute">
-                    <video className='w-full h-[100vh] object-contain '
+                <div className="w-full h-[100vh] bg-white absolute">
+                    <video className='w-full h-[100vh] object-contain'
                            ref={remoteVideoRef}
                            autoPlay
                            playsInline

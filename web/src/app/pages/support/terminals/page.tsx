@@ -22,15 +22,29 @@ export default function Terminals() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        axios
-            .get("http://foxstudios.ru:30009/api/v1/rooms/all").then((response) => {
-                setRooms(response.data);
-                setLoading(false);
-            }).catch((error: any) => {
-                console.error("Error fetching rooms:", error);
-                setError("Не удалось загрузить данные.");
-                setLoading(false);
-            });
+        // Function to fetch rooms
+        const fetchRooms = () => {
+            axios
+                .get("http://foxstudios.ru:30009/api/v1/rooms/all")
+                .then((response) => {
+                    setRooms(response.data);
+                    setLoading(false);
+                })
+                .catch((error: any) => {
+                    console.error("Error fetching rooms:", error);
+                    setError("Не удалось загрузить данные.");
+                    setLoading(false);
+                });
+        };
+
+        // Initial fetch
+        fetchRooms();
+
+        // Set up interval for periodic fetching
+        const interval = setInterval(fetchRooms, 3000);
+
+        // Cleanup function to clear interval when component unmounts
+        return () => clearInterval(interval);
     }, []);
 
     if (loading) {

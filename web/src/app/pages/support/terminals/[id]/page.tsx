@@ -72,12 +72,11 @@ export default function CallRoom() {
             wsRef.current.send(JSON.stringify(message));
         }
     };
+    
 
-    useEffect(() => {
-        handleStartCamera();
-    }, []);
+    
 
-    const handleEndCall = () => {+
+    const handleEndCall = () => {
         sendMessage({
             type: 'disconnect',
             room: roomId
@@ -104,6 +103,8 @@ export default function CallRoom() {
 
         console.log("Call ended");
     };
+
+    
 
     const createPeerConnection = () => {
         if (peerConnectionRef.current) {
@@ -167,6 +168,13 @@ export default function CallRoom() {
             if (localVideoRef.current) {
                 localVideoRef.current.srcObject = stream;
             }
+            
+            if (peerConnectionRef.current) {
+                localStreamRef.current?.getTracks().forEach(track => {
+                    peerConnectionRef.current?.addTrack(track, localStreamRef.current!);
+                });
+            }
+
             setIsJoinButtonDisabled(false);
         } catch (err) {
             console.error('Error accessing media devices:', err);
@@ -309,23 +317,31 @@ export default function CallRoom() {
 
     useEffect(() => {
         const roomId = params?.id;
+        
+        // Create an async function inside useEffect
+        const initCamera = async () => {
+            await handleStartCamera();
+            console.log("Camera started");
+            if (!roomId) return;
 
-        if (!roomId) return;
+            axios
+                .get(`http://foxstudios.ru:30009/api/v1/rooms/get/${roomId}`)
+                .then((response) => {
+                    setRoom(response.data);
+                    setLoading(false);
+                    if (!wsRef.current) {
+                        handleJoinRoom();
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error fetching room details:", error);
+                    setError("Не удалось загрузить данные.");
+                    setLoading(false);
+                });
+        };
 
-        axios
-            .get(`http://foxstudios.ru:30009/api/v1/rooms/get/${roomId}`)
-            .then((response) => {
-                setRoom(response.data);
-                setLoading(false);
-                if (!wsRef.current) {
-                    handleJoinRoom();
-                }
-            })
-            .catch((error) => {
-                console.error("Error fetching room details:", error);
-                setError("Не удалось загрузить данные.");
-                setLoading(false);
-            });
+        // Call the async function
+        initCamera();
     }, [params?.id]);
 
     if (loading) {

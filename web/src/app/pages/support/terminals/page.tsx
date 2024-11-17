@@ -25,8 +25,8 @@ export default function Terminals() {
         axios
             .get("http://kaiv.space:6000/api/v1/rooms/all", {
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
+                    "Access-Control-Allow-Origin": "*",
+
                 },
                 withCredentials: true
             }).then((response) => {

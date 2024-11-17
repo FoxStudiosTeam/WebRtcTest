@@ -55,6 +55,30 @@ export default function WebRTCChat() {
         handleStartCamera();
     }, []);
 
+    const handleEndCall = () => {
+        // Закрываем WebSocket
+        wsRef.current?.close();
+        wsRef.current = null;
+    
+        // Останавливаем RTCPeerConnection
+        peerConnectionRef.current?.close();
+        peerConnectionRef.current = null;
+    
+        // Останавливаем все треки локального потока
+        localStreamRef.current?.getTracks().forEach(track => track.stop());
+        localStreamRef.current = null;
+    
+        // Очищаем видеоэлементы
+        if (localVideoRef.current) {
+            localVideoRef.current.srcObject = null;
+        }
+        if (remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = null;
+        }
+    
+        console.log("Call ended");
+    };
+
     const createPeerConnection = () => {
         if (peerConnectionRef.current) {
             console.log("Closing existing peer connection");
@@ -325,7 +349,7 @@ export default function WebRTCChat() {
                     {isVideoMuted ? 'Вас не видно' : 'Вас видно'}
                 </button>
                 {isAudioMuted ? <MicOff onclick={handleToggleAudio}/> : <MicOn onclick={handleToggleAudio}/>}
-                <Reset/>
+                <Reset onclick={handleEndCall}/>
                 <input
                     type="range"
                     min={`${volumeMin}`}
